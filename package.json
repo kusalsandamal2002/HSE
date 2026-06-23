@@ -1,0 +1,17 @@
+{
+  "name": "hse-full-dev",
+  "version": "1.0.0",
+  "private": true,
+  "main": "desktop/main.js",
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:desktop": "electron desktop/main.js",
+    "dev:all": "concurrently -k -n backend,frontend,desktop -c cyan,green,magenta \"npm run dev:backend\" \"npm run dev:frontend\" \"wait-on http://localhost:5173 && npm run dev:desktop\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "electron": "^33.3.1",
+    "wait-on": "^8.0.1"
+  }
+}

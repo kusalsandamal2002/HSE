@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HSE TV Dashboard</title>
+  <link rel="stylesheet" href="/tv-assets/tv.css" />
+</head>
+<body>
+  <main class="tv-shell">
+    <header class="tv-header">
+      <div class="tv-brand">
+        <span class="tv-logo-box">
+          <img src="/tv-assets/assets/laugfs-rubber-logo.jpg" alt="LAUGFS Rubber" />
+        </span>
+        <div>
+          <p class="eyebrow" id="businessUnitName">LAUGFS Rubber / LAUGFS Industrial Tyres</p>
+          <h1 id="dashboardTitle">Live HSE Dashboard</h1>
+          <p class="tv-company-full" id="companyName">LAUGFS Corporation (Rubber) Limited</p>
+          <p class="tv-company-meta">Factory: Miriswaththa, Millewa, Horana, Sri Lanka / +94 11 5 566 222</p>
+        </div>
+      </div>
+      <div class="clock-box">
+        <span id="clock">--:--</span>
+        <small id="dateText">Loading...</small>
+      </div>
+    </header>
+
+    <div class="tv-display-controls" id="displayControls">
+      <button class="fullscreen-button" id="fullscreenButton" type="button">Enter Full Screen</button>
+      <span class="fullscreen-hint" id="fullscreenHint">Press F or click Enter Full Screen for TV display.</span>
+    </div>
+
+    <section class="slide" id="slide">
+      <p class="slide-subtitle" id="slideSubtitle">Loading live safety data...</p>
+      <h2 id="slideTitle">Please wait</h2>
+      <div class="value-row">
+        <span id="slideValue">--</span>
+        <small id="slideUnit"></small>
+      </div>
+    </section>
+
+    <section class="kpi-grid" id="kpiGrid"></section>
+    <section class="tv-charts" id="tvCharts" aria-label="HSE dashboard charts"></section>
+
+    <footer class="tv-footer">
+      <span id="counter">KPI 1 / 1</span>
+      <span id="chartCounter">Charts 1 / 1</span>
+      <span id="generatedAt">Generated at --</span>
+    </footer>
+  </main>
+  <script src="/tv-assets/tv.js"></script>
+</body>
+</html>
