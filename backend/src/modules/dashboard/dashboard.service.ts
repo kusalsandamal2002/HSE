@@ -1,4 +1,4 @@
-﻿import { ObservationType, Prisma } from "@prisma/client";
+import { ObservationType, Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import { monthRange } from "../../utils/http";
 
@@ -90,6 +90,50 @@ function incidentTypeBucket(name?: string | null) {
   if (value.includes("medical")) return "medicalTreatment";
   if (value.includes("report")) return "reportable";
   return "other";
+}
+
+
+type TfTsSummary = {
+  tfTotal: number;
+  tfRate: number;
+  tsTotal: number;
+  tsRate: number;
+  tfTsSource: string | null;
+  tfTsPeriod: string | null;
+  tfTsTracked: boolean;
+};
+
+function emptyTfTsSummary(): TfTsSummary {
+  return {
+    tfTotal: 0,
+    tfRate: 0,
+    tsTotal: 0,
+    tsRate: 0,
+    tfTsSource: null,
+    tfTsPeriod: null,
+    tfTsTracked: false,
+  };
+}
+
+async function readTfTsSummary(year: number): Promise<TfTsSummary> {
+  try {
+    const metric = await prisma.tfTsMetric.findUnique({ where: { year } });
+    if (!metric || !metric.tracked || !metric.source || !metric.periodLabel) {
+      return emptyTfTsSummary();
+    }
+
+    return {
+      tfTotal: metric.tfTotal || 0,
+      tfRate: Number(metric.tfRate || 0),
+      tsTotal: metric.tsTotal || 0,
+      tsRate: Number(metric.tsRate || 0),
+      tfTsSource: metric.source,
+      tfTsPeriod: metric.periodLabel,
+      tfTsTracked: true,
+    };
+  } catch {
+    return emptyTfTsSummary();
+  }
 }
 
 async function getWorkingHoursTotal(filters: DashboardFilters) {
@@ -418,6 +462,7 @@ export async function getDashboardSummary(filters: DashboardFilters) {
     workingHours: item.workingHours,
     afr: item.afr,
   }));
+  const tfTsSummary = await readTfTsSummary(year);
 
   return {
     filters: { year, month: scopedFilters.month, departmentId: scopedFilters.departmentId },
@@ -436,6 +481,7 @@ export async function getDashboardSummary(filters: DashboardFilters) {
       overdueActions,
       totalWorkingHours,
       afr,
+      ...tfTsSummary,
     },
     charts: {
       monthlyTrend,

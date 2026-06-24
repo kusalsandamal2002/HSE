@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "seed": "tsx prisma/seed.ts",
     "import:may-excel": "tsx prisma/import-may-excel-manual.ts",
+    "import:esg-metrics": "tsx prisma/import-esg-metrics.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
