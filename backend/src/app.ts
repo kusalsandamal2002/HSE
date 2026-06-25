@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -19,6 +19,7 @@ import { reportsRouter } from "./modules/reports/reports.routes";
 import { tvDashboardRouter } from "./modules/tv-dashboard/tv.routes";
 import { attachmentsRouter } from "./modules/attachments/attachments.routes";
 import { importsRouter } from "./modules/imports/imports.routes.js";
+import { dataEntryRouter } from "./modules/data-entry/data-entry.routes";
 
 export const app = express();
 
@@ -41,6 +42,7 @@ app.use("/api/reports", reportsRouter);
 app.use("/api/tv", tvDashboardRouter);
 app.use("/api/attachments", attachmentsRouter);
 app.use("/api/imports", importsRouter);
+app.use("/api/data-entry", dataEntryRouter);
 
 const tvDir = path.resolve(process.cwd(), "../tv-display");
 app.use("/tv-assets", express.static(tvDir));
@@ -48,5 +50,6 @@ app.get("/tv", (_req, res) => res.sendFile(path.join(tvDir, "tv.html")));
 
 app.use((_req, res) => res.status(404).json({ message: "Route not found" }));
 app.use(errorHandler);
+
 
 

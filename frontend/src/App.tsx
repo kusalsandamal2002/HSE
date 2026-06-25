@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { clearToken, getToken } from "./lib/api";
 import { appName, companyLogoSrc, companyProfile } from "./lib/brand";
 import type { User } from "./types";
@@ -16,6 +16,8 @@ import { ReportsPage } from "./pages/ReportsPage";
 import { TvControlPage } from "./pages/TvControlPage";
 import { EsgDashboardPage, EsgReportsPage, type EsgPageKey } from "./pages/EsgModule";
 import { DataUploadCenterPage } from "./pages/DataUploadCenterPage";
+import { DataEntryCenterPage } from "./pages/DataEntryCenterPage";
+import { DataEntryTablePage } from "./pages/DataEntryTablePage";
 
 const hsePages = [
   { key: "master-dashboard", path: "/master-dashboard", label: "HSE Master Dashboard" },
@@ -32,6 +34,7 @@ const hsePages = [
 ] as const;
 
 const commonPages = [
+  { key: "data-entry", path: "/data-entry", label: "Data Entry Center" },
   { key: "data-upload", path: "/data-upload", label: "Data Upload Center" },
 ] as const;
 
@@ -54,6 +57,7 @@ for (const item of allPages) {
 
 function resolvePage(pathname: string): PageKey {
   const slug = pathname.replace(/^\/+/, "");
+  if (slug === "data-entry" || slug.startsWith("data-entry/")) return "data-entry";
   return pageByPath.get(slug) ?? "master-dashboard";
 }
 
@@ -61,7 +65,13 @@ function getPageLabel(page: PageKey) {
   return allPages.find((item) => item.key === page)?.label ?? "Master Dashboard";
 }
 
+function getDataEntryTableKey(routePath: string) {
+  const parts = routePath.replace(/^\/+/, "").split("/");
+  return parts[0] === "data-entry" ? parts[1] || "" : "";
+}
+
 export function App() {
+  const [routePath, setRoutePath] = useState(window.location.pathname);
   const [page, setPage] = useState<PageKey>(() => resolvePage(window.location.pathname));
   const [user, setUser] = useState<User | null>(() => {
     const raw = localStorage.getItem("hse_user");
@@ -70,7 +80,10 @@ export function App() {
   const [hasToken, setHasToken] = useState(Boolean(getToken()));
 
   useEffect(() => {
-    const onPopState = () => setPage(resolvePage(window.location.pathname));
+    const onPopState = () => {
+      setRoutePath(window.location.pathname);
+      setPage(resolvePage(window.location.pathname));
+    };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
@@ -79,8 +92,9 @@ export function App() {
 
   function navigate(nextPath: string) {
     const cleanPath = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
-    setPage(resolvePage(cleanPath));
     window.history.pushState({}, "", cleanPath);
+    setRoutePath(cleanPath);
+    setPage(resolvePage(cleanPath));
   }
 
   function handleLogout() {
@@ -100,7 +114,6 @@ export function App() {
     return <LoginPage onLogin={(u) => { setUser(u); setHasToken(true); }} />;
   }
 
-
   function renderPage() {
     switch (page) {
       case "master-dashboard": return <MasterDashboardPage />;
@@ -114,6 +127,12 @@ export function App() {
       case "master": return <MasterDataPage />;
       case "reports": return <ReportsPage />;
       case "tv": return <TvControlPage />;
+      case "data-entry": {
+        const tableKey = getDataEntryTableKey(routePath);
+        return tableKey
+          ? <DataEntryTablePage tableKey={tableKey} onNavigate={(next) => navigate(next)} />
+          : <DataEntryCenterPage onNavigate={(next) => navigate(next)} />;
+      }
       case "data-upload": return <DataUploadCenterPage scope="all" onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
       case "esg-dashboard": return <EsgDashboardPage onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
       case "esg-upload": return <DataUploadCenterPage scope="esg" onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
@@ -192,8 +211,3 @@ export function App() {
     </div>
   );
 }
-
-
-
-
-
