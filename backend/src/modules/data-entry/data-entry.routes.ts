@@ -22,7 +22,7 @@ type TableConfig = {
   key: string;
   title: string;
   description: string;
-  category: "HSE" | "Common" | "Master" | "ESG";
+  category: "HSE" | "Common" | "Master" | "ESG" | "Company";
   model: string;
   fields: FieldDef[];
   orderBy?: any;
@@ -190,6 +190,26 @@ const tables: Record<string, TableConfig> = {
       { key: "periodLabel", label: "Period Label", type: "text", required: true },
       { key: "tracked", label: "Tracked", type: "boolean" },
       { key: "payload", label: "Payload JSON", type: "json", required: true },
+    ],
+  },
+
+  companyProfileFields: {
+    key: "companyProfileFields",
+    title: "Company Profile Data",
+    description: "Edit company identity, contact, overview, policies, certifications, and values.",
+    category: "Company",
+    model: "companyProfileField",
+    deleteMode: "deactivate",
+    where: { isActive: true },
+    orderBy: [{ section: "asc" }, { sortOrder: "asc" }],
+    fields: [
+      { key: "key", label: "Key", type: "text", required: true },
+      { key: "section", label: "Section", type: "text", required: true },
+      { key: "label", label: "Label", type: "text", required: true },
+      { key: "value", label: "Value", type: "textarea", required: true },
+      { key: "fieldType", label: "Field Type", type: "select", options: ["text", "textarea", "list"] },
+      { key: "sortOrder", label: "Sort Order", type: "number" },
+      { key: "isActive", label: "Active", type: "boolean" },
     ],
   },
   departments: {
@@ -479,4 +499,5 @@ dataEntryRouter.delete("/:tableKey/:id", async (req, res, next) => {
     res.json(normalizeRow(deleted, config));
   } catch (error) { next(error); }
 });
+
 

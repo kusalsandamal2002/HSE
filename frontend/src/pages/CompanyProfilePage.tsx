@@ -1,45 +1,52 @@
-import type { ReactNode } from "react";
-import { brandName, businessUnitName, companyLogoSrc, companyName, companyProfile } from "../lib/brand";
+﻿import { useEffect, useState } from "react";
+import { api } from "../lib/api";
+import {
+  brandName as fallbackBrandName,
+  businessUnitName as fallbackBusinessUnitName,
+  companyLogoSrc as fallbackCompanyLogoSrc,
+  companyName as fallbackCompanyName,
+  companyProfile as fallbackCompanyProfile,
+} from "../lib/brand";
 
 type AccentTone = "cyan" | "blue" | "green" | "gold" | "purple" | "teal";
 type IconKind = "building" | "spark" | "layers" | "factory" | "office" | "phone" | "mail" | "leaf" | "shield" | "check" | "globe" | "star" | "gear";
 
-const sharedOverview = "LAUGFS Corporation (Rubber) Limited is the industrial tyre manufacturing arm of LAUGFS Rubber, supporting material handling, construction, ground support, and specialist industrial applications with a focus on safety, quality, sustainability, and operational excellence.";
-const integratedContext = [
-  "HSE Management",
-  "ESG Monitoring",
-  "Quality Control",
-  "Compliance Tracking",
-  "Operational Risk Management",
-  "Sustainability Performance",
-];
-const moduleCards = [
-  {
-    title: "HSE Operations",
-    tone: "teal" as AccentTone,
-    icon: "shield" as IconKind,
-    copy: "Accident reporting, corrective actions, medical expenses, near miss/unsafe observations, working hours, AFR, TF/TS.",
-    chips: ["Accident register", "Corrective actions", "Medical expenses", "Near miss / unsafe", "Working hours", "AFR", "TF/TS"],
-  },
-  {
-    title: "ESG Management",
-    tone: "gold" as AccentTone,
-    icon: "leaf" as IconKind,
-    copy: "GHG emission intensity, scrap flash waste reduction, waste recycling, noise monitoring, TF/TS, stakeholder concerns.",
-    chips: ["GHG intensity", "Scrap flash waste", "Waste recycling", "Noise monitoring", "TF/TS", "Stakeholder concerns"],
-  },
-];
-const identityCards = [
-  { label: "Company Name", value: companyName, note: "Legal entity", tone: "cyan" as AccentTone, icon: "building" as IconKind },
-  { label: "Brand", value: brandName, note: "Public brand identity", tone: "blue" as AccentTone, icon: "spark" as IconKind },
-  { label: "Business Unit", value: businessUnitName, note: "Industrial tyre operations", tone: "green" as AccentTone, icon: "layers" as IconKind },
-  { label: "Factory", value: companyProfile.factory, note: "Production site", tone: "teal" as AccentTone, icon: "factory" as IconKind },
-  { label: "Head Office", value: companyProfile.headOffice, note: "Corporate office", tone: "gold" as AccentTone, icon: "office" as IconKind },
-  { label: "Phone", value: companyProfile.phone, note: "Main contact", tone: "purple" as AccentTone, icon: "phone" as IconKind },
-  { label: "Email", value: companyProfile.email, note: "Corporate inbox", tone: "cyan" as AccentTone, icon: "mail" as IconKind },
-];
-const companyValues = companyProfile.values;
-const policyChips = [...companyProfile.policyReferences, ...companyProfile.certifications];
+type CompanyProfileApi = {
+  companyName: string;
+  brandName: string;
+  businessUnitName: string;
+  companyLogoSrc: string;
+  sharedOverview: string;
+  integratedContext: string[];
+  companyProfile: {
+    headOffice: string;
+    factory: string;
+    phone: string;
+    email: string;
+    industrySummary: string;
+    productAreas: string[];
+    policyReferences: string[];
+    certifications: string[];
+    values: string[];
+  };
+};
+
+const fallbackProfile: CompanyProfileApi = {
+  companyName: fallbackCompanyName,
+  brandName: fallbackBrandName,
+  businessUnitName: fallbackBusinessUnitName,
+  companyLogoSrc: fallbackCompanyLogoSrc,
+  sharedOverview: "LAUGFS Corporation (Rubber) Limited is the industrial tyre manufacturing arm of LAUGFS Rubber, supporting material handling, construction, ground support, and specialist industrial applications with a focus on safety, quality, sustainability, and operational excellence.",
+  integratedContext: [
+    "HSE Management",
+    "ESG Monitoring",
+    "Quality Control",
+    "Compliance Tracking",
+    "Operational Risk Management",
+    "Sustainability Performance",
+  ],
+  companyProfile: fallbackCompanyProfile,
+};
 
 function ProfileIcon({ kind }: { kind: IconKind }) {
   const props = {
@@ -117,6 +124,51 @@ function IdentityCard({ label, value, note, tone, icon }: { label: string; value
 }
 
 export function CompanyProfilePage() {
+  const [profile, setProfile] = useState<CompanyProfileApi>(fallbackProfile);
+  const [status, setStatus] = useState("Loading company profile...");
+
+  useEffect(() => {
+    api<CompanyProfileApi>("/api/company-profile")
+      .then((data) => {
+        setProfile(data);
+        setStatus("Database-backed company profile");
+      })
+      .catch(() => {
+        setStatus("Static fallback profile");
+      });
+  }, []);
+
+  const { companyName, brandName, businessUnitName, companyLogoSrc, companyProfile } = profile;
+
+  const identityCards = [
+    { label: "Company Name", value: companyName, note: "Legal entity", tone: "cyan" as AccentTone, icon: "building" as IconKind },
+    { label: "Brand", value: brandName, note: "Public brand identity", tone: "blue" as AccentTone, icon: "spark" as IconKind },
+    { label: "Business Unit", value: businessUnitName, note: "Industrial tyre operations", tone: "green" as AccentTone, icon: "layers" as IconKind },
+    { label: "Factory", value: companyProfile.factory, note: "Production site", tone: "teal" as AccentTone, icon: "factory" as IconKind },
+    { label: "Head Office", value: companyProfile.headOffice, note: "Corporate office", tone: "gold" as AccentTone, icon: "office" as IconKind },
+    { label: "Phone", value: companyProfile.phone, note: "Main contact", tone: "purple" as AccentTone, icon: "phone" as IconKind },
+    { label: "Email", value: companyProfile.email, note: "Corporate inbox", tone: "cyan" as AccentTone, icon: "mail" as IconKind },
+  ];
+
+  const moduleCards = [
+    {
+      title: "HSE Operations",
+      tone: "teal" as AccentTone,
+      icon: "shield" as IconKind,
+      copy: "Accident reporting, corrective actions, medical expenses, near miss/unsafe observations, working hours, AFR, TF/TS.",
+      chips: ["Accident register", "Corrective actions", "Medical expenses", "Near miss / unsafe", "Working hours", "AFR", "TF/TS"],
+    },
+    {
+      title: "ESG Management",
+      tone: "gold" as AccentTone,
+      icon: "leaf" as IconKind,
+      copy: "GHG emission intensity, scrap flash waste reduction, waste recycling, noise monitoring, TF/TS, stakeholder concerns.",
+      chips: ["GHG intensity", "Scrap flash waste", "Waste recycling", "Noise monitoring", "TF/TS", "Stakeholder concerns"],
+    },
+  ];
+
+  const policyChips = [...companyProfile.policyReferences, ...companyProfile.certifications];
+
   return (
     <section className="company-profile-page">
       <header className="cp-hero cp-card">
@@ -128,12 +180,12 @@ export function CompanyProfilePage() {
             <p>Company Profile</p>
             <h1>{companyName}</h1>
             <small>{brandName} / {businessUnitName}</small>
-            <span>Industrial tyre manufacturing, safety, quality, sustainability, and operational excellence.</span>
+            <span>{companyProfile.industrySummary}</span>
           </div>
         </div>
 
         <div className="cp-hero-side">
-          <span className="cp-kicker">Shared company identity</span>
+          <span className="cp-kicker">{status}</span>
           <strong>One profile for HSE and ESG</strong>
           <p>Company profile information is used across HSE and ESG dashboards for consistent reporting identity.</p>
           <div className="cp-mini-stats">
@@ -159,7 +211,7 @@ export function CompanyProfilePage() {
       <div className="cp-split-grid">
         <section className="cp-card cp-overview-card">
           <SectionHeading eyebrow="Corporate Overview" title="Common company context" detail="A single identity layer for the unified management system" icon="star" />
-          <p className="cp-copy">{sharedOverview}</p>
+          <p className="cp-copy">{profile.sharedOverview}</p>
           <div className="cp-inline-summary">
             <div>
               <span>Factory</span>
@@ -185,7 +237,7 @@ export function CompanyProfilePage() {
       <div className="cp-split-grid">
         <section className="cp-card">
           <SectionHeading eyebrow="Integrated Management Context" title="Common operating context" detail="Shared control language across HSE, ESG, quality, and compliance" icon="globe" />
-          <AccentChipList items={integratedContext} tone="cyan" />
+          <AccentChipList items={profile.integratedContext} tone="cyan" />
         </section>
 
         <section className="cp-card">
@@ -198,7 +250,7 @@ export function CompanyProfilePage() {
         <section className="cp-card">
           <SectionHeading eyebrow="Values" title="Company values" detail="The culture behind the management system" icon="spark" />
           <div className="cp-values-grid">
-            {companyValues.map((value, index) => (
+            {companyProfile.values.map((value, index) => (
               <article key={value} className={`cp-value-card cp-value-${["cyan", "green", "gold", "blue", "purple", "teal"][index % 6]}` as string}>
                 <span><ProfileIcon kind="star" /></span>
                 <strong>{value}</strong>
@@ -230,7 +282,7 @@ export function CompanyProfilePage() {
         <span className="cp-card-icon"><ProfileIcon kind="gear" /></span>
         <div>
           <strong>Admin / System Note</strong>
-          <p>Company profile information is used across HSE and ESG dashboards for consistent reporting identity.</p>
+          <p>Edit company profile values from Data Center &gt; Data Entry Center &gt; Company Profile Data.</p>
         </div>
       </section>
     </section>
