@@ -60,3 +60,138 @@ reportsRouter.get("/yearly", async (req, res, next) => {
     res.json({ reportType: "YEARLY_HSE_REPORT", generatedAt: new Date().toISOString(), filters, dashboard, incidents, actions, expenses, observations, workingHours });
   } catch (error) { next(error); }
 });
+reportsRouter.get("/backup/system", async (_req, res, next) => {
+  try {
+    const generatedAt = new Date();
+    const stamp = generatedAt.toISOString().slice(0, 19).replace(/[:T]/g, "-");
+
+    const [
+      users,
+      departments,
+      shifts,
+      employees,
+      machines,
+      incidentTypes,
+      injuryTypes,
+      rootCauses,
+      incidents,
+      correctiveActions,
+      medicalExpenses,
+      observations,
+      workingHours,
+      tvSettings,
+      tfTsMetrics,
+      esgSnapshots,
+      companyProfileFields,
+      importBatches,
+    ] = await Promise.all([
+      prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: { name: "asc" },
+      }),
+      prisma.department.findMany({ orderBy: { name: "asc" } }),
+      prisma.shift.findMany({ orderBy: { name: "asc" } }),
+      prisma.employee.findMany({ include: { department: true, shift: true }, orderBy: { name: "asc" } }),
+      prisma.machine.findMany({ include: { department: true }, orderBy: { name: "asc" } }),
+      prisma.incidentType.findMany({ orderBy: { name: "asc" } }),
+      prisma.injuryType.findMany({ orderBy: { name: "asc" } }),
+      prisma.rootCause.findMany({ orderBy: { name: "asc" } }),
+      prisma.incident.findMany({
+        include: {
+          department: true,
+          shift: true,
+          employee: true,
+          machine: true,
+          incidentType: true,
+          injuryType: true,
+          rootCause: true,
+          correctiveActions: true,
+          medicalExpenses: true,
+        },
+        orderBy: [{ incidentDate: "desc" }, { createdAt: "desc" }],
+      }),
+      prisma.correctiveAction.findMany({
+        include: { incident: true, observation: true },
+        orderBy: [{ status: "asc" }, { dueDate: "asc" }],
+      }),
+      prisma.medicalExpense.findMany({
+        include: { incident: { include: { department: true } } },
+        orderBy: { expenseDate: "desc" },
+      }),
+      prisma.observation.findMany({
+        include: { department: true, correctiveActions: true },
+        orderBy: [{ observationDate: "desc" }, { createdAt: "desc" }],
+      }),
+      prisma.workingHours.findMany({
+        include: { department: true },
+        orderBy: [{ year: "desc" }, { month: "desc" }],
+      }),
+      prisma.tvDashboardSettings.findMany({ orderBy: { updatedAt: "desc" } }),
+      prisma.tfTsMetric.findMany({ orderBy: { year: "desc" } }),
+      prisma.esgDashboardSnapshot.findMany({ orderBy: { year: "desc" } }),
+      prisma.companyProfileField.findMany({ orderBy: [{ section: "asc" }, { sortOrder: "asc" }] }),
+      prisma.importBatch.findMany({
+        include: {
+          file: true,
+          detectedSections: true,
+          previewRows: true,
+          validationIssues: true,
+        },
+        orderBy: { uploadedAt: "desc" },
+        take: 100,
+      }),
+    ]);
+
+    const payload = {
+      backupType: "FULL_SYSTEM_JSON_BACKUP",
+      generatedAt: generatedAt.toISOString(),
+      application: "HSE Management System",
+      note: "This is a JSON export backup for reporting/audit/archive use. It does not include user password hashes.",
+      data: {
+        users,
+        masterData: {
+          departments,
+          shifts,
+          employees,
+          machines,
+          incidentTypes,
+          injuryTypes,
+          rootCauses,
+        },
+        hse: {
+          incidents,
+          correctiveActions,
+          medicalExpenses,
+          observations,
+          workingHours,
+        },
+        esg: {
+          tfTsMetrics,
+          esgSnapshots,
+        },
+        companyProfile: {
+          companyProfileFields,
+        },
+        tvDashboard: {
+          tvSettings,
+        },
+        imports: {
+          importBatches,
+        },
+      },
+    };
+
+    res.setHeader("Content-Disposition", `attachment; filename="hse-full-system-backup-${stamp}.json"`);
+    res.json(payload);
+  } catch (error) {
+    next(error);
+  }
+});

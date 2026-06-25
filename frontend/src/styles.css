@@ -5022,3 +5022,182 @@ textarea {
   color: #9eb6c2;
   padding: 30px !important;
 }
+
+/* ================================
+   Reports & Downloads
+================================ */
+
+.reports-download-page {
+  display: grid;
+  gap: 16px;
+}
+
+.rd-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+.rd-hero-meta {
+  min-width: 280px;
+  text-align: right;
+  display: grid;
+  gap: 5px;
+}
+
+.rd-hero-meta strong {
+  color: #38ffff;
+  font-size: 18px;
+}
+
+.rd-hero-meta span,
+.rd-hero-meta small {
+  color: #a8bfd0;
+}
+
+.rd-filters {
+  display: grid;
+  grid-template-columns: 150px 180px minmax(220px, 1fr) auto auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.rd-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.4fr) minmax(280px, 0.8fr) minmax(280px, 0.8fr);
+  gap: 16px;
+}
+
+.rd-card {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.rd-card h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.rd-card p {
+  margin: 0;
+  color: #a8bfd0;
+  line-height: 1.5;
+}
+
+.rd-kicker {
+  color: #38ffff;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-size: 12px;
+}
+
+.rd-main-card {
+  min-height: 245px;
+}
+
+.rd-kpis {
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+}
+
+.rd-button-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.rd-button-stack button,
+.rd-download-card,
+.rd-danger-card button {
+  border: 1px solid rgba(55, 255, 255, 0.35);
+  background: rgba(18, 70, 90, 0.72);
+  color: #eaffff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.rd-button-stack button:hover,
+.rd-download-card:hover,
+.rd-danger-card button:hover {
+  background: rgba(23, 115, 135, 0.95);
+}
+
+.rd-danger-card {
+  border-color: rgba(255, 197, 49, 0.45) !important;
+}
+
+.rd-danger-card small {
+  color: #ffcf39;
+}
+
+.rd-download-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.rd-download-card {
+  text-align: left;
+  min-height: 130px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.rd-download-card:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.rd-download-card span {
+  color: #ffcf39;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.rd-download-card strong {
+  font-size: 17px;
+}
+
+.rd-download-card small {
+  color: #abc4d6;
+  line-height: 1.45;
+}
+
+.rd-note p {
+  color: #a8bfd0;
+  margin-bottom: 0;
+}
+
+.success-state {
+  border: 1px solid rgba(77, 255, 165, 0.45) !important;
+  background: rgba(3, 55, 42, 0.48) !important;
+  color: #eaffff;
+}
+
+.success-state strong {
+  color: #6dffb4;
+}
+
+@media (max-width: 1200px) {
+  .rd-grid,
+  .rd-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .rd-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rd-hero-meta {
+    text-align: left;
+  }
+
+  .rd-kpis {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+}
