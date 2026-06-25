@@ -6,7 +6,7 @@ import { HttpError } from "../../utils/http";
 export const dataEntryRouter = Router();
 dataEntryRouter.use(requireAuth);
 
-type FieldType = "text" | "textarea" | "number" | "date" | "select" | "boolean";
+type FieldType = "text" | "textarea" | "number" | "date" | "select" | "boolean" | "json";
 
 type FieldDef = {
   key: string;
@@ -22,7 +22,7 @@ type TableConfig = {
   key: string;
   title: string;
   description: string;
-  category: "HSE" | "Common" | "Master";
+  category: "HSE" | "Common" | "Master" | "ESG";
   model: string;
   fields: FieldDef[];
   orderBy?: any;
@@ -32,8 +32,8 @@ type TableConfig = {
 
 const staticOptions = {
   severity: ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
-  status: ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"],
-  observationType: ["NEAR_MISS", "UNSAFE_ACT", "UNSAFE_CONDITION"],
+  status: ["PENDING", "IN_PROGRESS", "COMPLETED", "CLOSED", "OVERDUE"],
+  observationType: ["NEAR_MISS", "UNSAFE_ACT", "UNSAFE_CONDITION", "POSITIVE_OBSERVATION"],
   riskLevel: ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
 };
 
@@ -68,6 +68,28 @@ const tables: Record<string, TableConfig> = {
     ],
   },
 
+
+  correctiveActions: {
+    key: "correctiveActions",
+    title: "Corrective Actions",
+    description: "Enter, edit, and manage corrective action records linked to accidents or observations.",
+    category: "HSE",
+    model: "correctiveAction",
+    deleteMode: "soft-delete",
+    where: { isDeleted: false },
+    orderBy: [{ status: "asc" }, { dueDate: "asc" }],
+    fields: [
+      { key: "actionNo", label: "Action No", type: "text" },
+      { key: "incidentId", label: "Incident ID", type: "text" },
+      { key: "observationId", label: "Observation ID", type: "text" },
+      { key: "action", label: "Action", type: "textarea", required: true },
+      { key: "responsiblePerson", label: "Responsible Person", type: "text" },
+      { key: "dueDate", label: "Due Date", type: "date" },
+      { key: "completedDate", label: "Completed Date", type: "date" },
+      { key: "status", label: "Status", type: "select", options: staticOptions.status },
+      { key: "remarks", label: "Remarks", type: "textarea" },
+    ],
+  },
   medical: {
     key: "medical",
     title: "Medical Expenses",
@@ -131,6 +153,45 @@ const tables: Record<string, TableConfig> = {
     ],
   },
 
+
+  tfTsMetrics: {
+    key: "tfTsMetrics",
+    title: "TF / TS Metrics",
+    description: "Enter ESG safety metrics for total fatalities and total recordable cases.",
+    category: "ESG",
+    model: "tfTsMetric",
+    deleteMode: "hard-delete",
+    orderBy: { year: "desc" },
+    fields: [
+      { key: "year", label: "Year", type: "number", required: true },
+      { key: "tfTotal", label: "TF Total", type: "number" },
+      { key: "tfRate", label: "TF Rate", type: "number" },
+      { key: "tsTotal", label: "TS Total", type: "number" },
+      { key: "tsRate", label: "TS Rate", type: "number" },
+      { key: "source", label: "Source", type: "text" },
+      { key: "periodLabel", label: "Period Label", type: "text" },
+      { key: "tracked", label: "Tracked", type: "boolean" },
+    ],
+  },
+
+  esgSnapshots: {
+    key: "esgSnapshots",
+    title: "ESG Dashboard Snapshots",
+    description: "Edit imported ESG dashboard snapshot metadata and JSON payload.",
+    category: "ESG",
+    model: "esgDashboardSnapshot",
+    deleteMode: "hard-delete",
+    orderBy: { year: "desc" },
+    fields: [
+      { key: "year", label: "Year", type: "number", required: true },
+      { key: "sourceFile", label: "Source File", type: "text", required: true },
+      { key: "sourcePath", label: "Source Path", type: "text" },
+      { key: "sourceSheet", label: "Source Sheet", type: "text" },
+      { key: "periodLabel", label: "Period Label", type: "text", required: true },
+      { key: "tracked", label: "Tracked", type: "boolean" },
+      { key: "payload", label: "Payload JSON", type: "json", required: true },
+    ],
+  },
   departments: {
     key: "departments",
     title: "Departments",
@@ -270,7 +331,9 @@ function normalizeRow(row: any, config: TableConfig) {
   const output: any = { id: row.id };
   for (const field of config.fields) {
     const value = row[field.key];
-    output[field.key] = field.type === "date" ? dateOnly(value) : value;
+    if (field.type === "date") output[field.key] = dateOnly(value);
+    else if (field.type === "json") output[field.key] = value === null || value === undefined ? "" : JSON.stringify(value, null, 2);
+    else output[field.key] = value;
   }
   output.createdAt = row.createdAt ? dateOnly(row.createdAt) : undefined;
   output.updatedAt = row.updatedAt ? dateOnly(row.updatedAt) : undefined;
@@ -298,6 +361,19 @@ function normalizeBody(input: any, config: TableConfig, isCreate: boolean) {
 
     if (field.type === "date") {
       data[field.key] = raw === null ? null : new Date(raw);
+      continue;
+    }
+
+    if (field.type === "json") {
+      if (typeof raw === "string") {
+        try {
+          data[field.key] = JSON.parse(raw || "{}");
+        } catch {
+          throw new HttpError(400, `${field.label} must be valid JSON`);
+        }
+      } else {
+        data[field.key] = raw;
+      }
       continue;
     }
 
@@ -403,3 +479,4 @@ dataEntryRouter.delete("/:tableKey/:id", async (req, res, next) => {
     res.json(normalizeRow(deleted, config));
   } catch (error) { next(error); }
 });
+

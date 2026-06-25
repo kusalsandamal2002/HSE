@@ -2,7 +2,7 @@
 import { api } from "../lib/api";
 import type { Lookups, Lookup } from "../types";
 
-type FieldType = "text" | "textarea" | "number" | "date" | "select" | "boolean";
+type FieldType = "text" | "textarea" | "number" | "date" | "select" | "boolean" | "json";
 
 type FieldDef = {
   key: string;
@@ -53,6 +53,7 @@ function makeEmptyRow(meta: TableMeta): RowData {
   for (const field of meta.fields) {
     if (field.type === "number") row[field.key] = 0;
     else if (field.type === "boolean") row[field.key] = true;
+    else if (field.type === "json") row[field.key] = "{}";
     else if (field.type === "select" && field.options?.length) row[field.key] = field.options[0];
     else row[field.key] = "";
   }
@@ -186,12 +187,12 @@ export function DataEntryTablePage({ tableKey, onNavigate }: Props) {
   function renderInput(row: RowData, field: FieldDef) {
     const value = row[field.key] ?? "";
 
-    if (field.type === "textarea") {
+    if (field.type === "textarea" || field.type === "json") {
       return (
         <textarea
           value={value}
           onChange={(event) => updateCell(row.id, field.key, event.target.value)}
-          rows={2}
+          rows={field.type === "json" ? 6 : 2}
         />
       );
     }
@@ -330,3 +331,4 @@ export function DataEntryTablePage({ tableKey, onNavigate }: Props) {
     </div>
   );
 }
+
