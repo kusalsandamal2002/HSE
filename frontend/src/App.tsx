@@ -14,41 +14,69 @@ import { ObservationsPage } from "./pages/ObservationsPage";
 import { WorkingHoursPage } from "./pages/WorkingHoursPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { TvControlPage } from "./pages/TvControlPage";
-import { EsgDashboardPage, EsgReportsPage, type EsgPageKey } from "./pages/EsgModule";
+import { EsgDashboardPage, EsgReportsPage } from "./pages/EsgModule";
 import { DataUploadCenterPage } from "./pages/DataUploadCenterPage";
 import { DataEntryCenterPage } from "./pages/DataEntryCenterPage";
 import { DataEntryTablePage } from "./pages/DataEntryTablePage";
 
-const hsePages = [
+const mainDashboardPages = [
+  { key: "dashboard", path: "/dashboard", label: "Executive Dashboard" },
   { key: "master-dashboard", path: "/master-dashboard", label: "HSE Master Dashboard" },
-  { key: "dashboard", path: "/dashboard", label: "Dashboard" },
+  { key: "esg-dashboard", path: "/esg-dashboard", label: "ESG Master Dashboard" },
+] as const;
+
+const dataCenterPages = [
+  { key: "data-entry", path: "/data-entry", label: "Data Entry Center" },
+  { key: "data-upload", path: "/data-upload", label: "Data Upload Center" },
+] as const;
+
+const organizationPages = [
   { key: "company", path: "/company-profile", label: "Company Profile" },
+] as const;
+
+const reportingPages = [
+  { key: "reports", path: "/reports", label: "Reports & Downloads" },
+] as const;
+
+const displayPages = [
+  { key: "tv", path: "/tv-dashboard", label: "TV Dashboard" },
+] as const;
+
+/*
+  Hidden legacy routes:
+  These pages are kept working but removed from the main sidebar because data entry
+  will now be centralized through Common > Data Entry Center.
+*/
+const hiddenLegacyPages = [
   { key: "incidents", path: "/incidents", label: "Accident Register" },
   { key: "actions", path: "/corrective-actions", label: "Corrective Actions" },
   { key: "medical", path: "/medical-expenses", label: "Medical Expenses" },
   { key: "observations", path: "/observations", label: "Near Miss / Unsafe" },
   { key: "hours", path: "/working-hours", label: "Working Hours" },
   { key: "master", path: "/master-data", label: "Master Data" },
-  { key: "reports", path: "/reports", label: "Reports" },
-  { key: "tv", path: "/tv-dashboard", label: "TV Dashboard" },
-] as const;
-
-const commonPages = [
-  { key: "data-entry", path: "/data-entry", label: "Data Entry Center" },
-  { key: "data-upload", path: "/data-upload", label: "Data Upload Center" },
-] as const;
-
-const esgPages = [
-  { key: "esg-dashboard", path: "/esg-dashboard", label: "ESG Master Dashboard" },
   { key: "esg-upload", path: "/esg-upload", label: "ESG Data Upload" },
   { key: "esg-reports", path: "/esg-reports", label: "ESG Reports" },
 ] as const;
 
-type HsePageKey = typeof hsePages[number]["key"];
-type CommonPageKey = typeof commonPages[number]["key"];
-type PageKey = HsePageKey | CommonPageKey | EsgPageKey;
+const navSections = [
+  { title: "Main Dashboards", pages: mainDashboardPages },
+  { title: "Data Center", pages: dataCenterPages },
+  { title: "Organization", pages: organizationPages },
+  { title: "Reporting", pages: reportingPages },
+  { title: "Display", pages: displayPages },
+] as const;
 
-const allPages = [...hsePages, ...commonPages, ...esgPages] as const;
+const allPages = [
+  ...mainDashboardPages,
+  ...dataCenterPages,
+  ...organizationPages,
+  ...reportingPages,
+  ...displayPages,
+  ...hiddenLegacyPages,
+] as const;
+
+type PageKey = typeof allPages[number]["key"];
+
 const pageByPath = new Map<string, PageKey>();
 for (const item of allPages) {
   pageByPath.set(item.path.replace(/^\/+/, ""), item.key);
@@ -58,11 +86,21 @@ for (const item of allPages) {
 function resolvePage(pathname: string): PageKey {
   const slug = pathname.replace(/^\/+/, "");
   if (slug === "data-entry" || slug.startsWith("data-entry/")) return "data-entry";
-  return pageByPath.get(slug) ?? "master-dashboard";
+  return pageByPath.get(slug) ?? "dashboard";
 }
 
 function getPageLabel(page: PageKey) {
-  return allPages.find((item) => item.key === page)?.label ?? "Master Dashboard";
+  return allPages.find((item) => item.key === page)?.label ?? "Executive Dashboard";
+}
+
+function getPageGroup(page: PageKey) {
+  if (mainDashboardPages.some((item) => item.key === page)) return "Dashboards";
+  if (dataCenterPages.some((item) => item.key === page)) return "Data Center";
+  if (organizationPages.some((item) => item.key === page)) return "Organization";
+  if (reportingPages.some((item) => item.key === page)) return "Reporting";
+  if (displayPages.some((item) => item.key === page)) return "Display";
+  if (String(page).startsWith("esg-")) return "ESG";
+  return "HSE";
 }
 
 function getDataEntryTableKey(routePath: string) {
@@ -104,10 +142,10 @@ export function App() {
     setHasToken(false);
   }
 
-  const isMasterDashboard = page === "master-dashboard";
+  const isHseMasterDashboard = page === "master-dashboard";
   const isCompanyProfile = page === "company";
   const isCommonUpload = page === "data-upload";
-  const isEsgPage = page.startsWith("esg-");
+  const isEsgPage = String(page).startsWith("esg-");
   const isShelllessPage = isCommonUpload || isEsgPage;
 
   if (!hasToken || !user) {
@@ -116,17 +154,10 @@ export function App() {
 
   function renderPage() {
     switch (page) {
-      case "master-dashboard": return <MasterDashboardPage />;
       case "dashboard": return <DashboardPage />;
-      case "company": return <CompanyProfilePage />;
-      case "incidents": return <IncidentsPage />;
-      case "actions": return <ActionsPage />;
-      case "medical": return <MedicalPage />;
-      case "observations": return <ObservationsPage />;
-      case "hours": return <WorkingHoursPage />;
-      case "master": return <MasterDataPage />;
-      case "reports": return <ReportsPage />;
-      case "tv": return <TvControlPage />;
+      case "master-dashboard": return <MasterDashboardPage />;
+      case "esg-dashboard": return <EsgDashboardPage onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
+
       case "data-entry": {
         const tableKey = getDataEntryTableKey(routePath);
         return tableKey
@@ -134,15 +165,27 @@ export function App() {
           : <DataEntryCenterPage onNavigate={(next) => navigate(next)} />;
       }
       case "data-upload": return <DataUploadCenterPage scope="all" onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
-      case "esg-dashboard": return <EsgDashboardPage onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
+
+      case "company": return <CompanyProfilePage />;
+      case "reports": return <ReportsPage />;
+      case "tv": return <TvControlPage />;
+
+      /* Hidden legacy routes still work if opened directly */
+      case "incidents": return <IncidentsPage />;
+      case "actions": return <ActionsPage />;
+      case "medical": return <MedicalPage />;
+      case "observations": return <ObservationsPage />;
+      case "hours": return <WorkingHoursPage />;
+      case "master": return <MasterDataPage />;
       case "esg-upload": return <DataUploadCenterPage scope="esg" onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
       case "esg-reports": return <EsgReportsPage onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
-      default: return <MasterDashboardPage />;
+
+      default: return <DashboardPage />;
     }
   }
 
   return (
-    <div className={isMasterDashboard ? "app-shell master-shell" : "app-shell"}>
+    <div className={isHseMasterDashboard ? "app-shell master-shell" : "app-shell"}>
       <aside className="sidebar">
         <div className="brand sidebar-brand">
           <span className="logo-mark sidebar-logo">
@@ -154,58 +197,59 @@ export function App() {
           </div>
         </div>
 
-        <section className="sidebar-section">
-          <span className="sidebar-section-title">HSE</span>
-          <nav aria-label="HSE navigation">
-            {hsePages.map((item) => (
-              <button key={item.key} className={page === item.key ? "active" : ""} onClick={() => navigate(item.path)}>{item.label}</button>
-            ))}
-          </nav>
-        </section>
-
-        <section className="sidebar-section">
-          <span className="sidebar-section-title">Common</span>
-          <nav aria-label="Common navigation">
-            {commonPages.map((item) => (
-              <button key={item.key} className={page === item.key ? "active" : ""} onClick={() => navigate(item.path)}>{item.label}</button>
-            ))}
-          </nav>
-        </section>
-
-        <section className="sidebar-section">
-          <span className="sidebar-section-title">ESG</span>
-          <nav aria-label="ESG navigation">
-            {esgPages.map((item) => (
-              <button key={item.key} className={page === item.key ? "active" : ""} onClick={() => navigate(item.path)}>{item.label}</button>
-            ))}
-          </nav>
-        </section>
+        {navSections.map((section) => (
+          <section key={section.title} className="sidebar-section">
+            <span className="sidebar-section-title">{section.title}</span>
+            <nav aria-label={`${section.title} navigation`}>
+              {section.pages.map((item) => (
+                <button
+                  key={item.key}
+                  className={page === item.key ? "active" : ""}
+                  onClick={() => navigate(item.path)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+          </section>
+        ))}
 
         <footer className="sidebar-foot">
           <span>Factory</span>
           <strong>{companyProfile.factory}</strong>
         </footer>
       </aside>
-      <main className={isMasterDashboard ? "main master-main" : isCompanyProfile ? "main company-profile-main" : isCommonUpload ? "main upload-center-main" : "main"}>
-        {!isMasterDashboard && !isShelllessPage && <header className="topbar">
-          <div className="topbar-title">
-            <span className="logo-mark topbar-logo">
-              <img src={companyLogoSrc} alt="LAUGFS Rubber" />
-            </span>
-            <div>
-              <p>{isCompanyProfile ? "Corporate" : page.startsWith("esg-") ? "ESG" : "HSE"}</p>
-              <h1>{getPageLabel(page)}</h1>
-              <small>{isCompanyProfile ? "Shared company profile" : appName}</small>
+
+      <main className={
+        isHseMasterDashboard
+          ? "main master-main"
+          : isCompanyProfile
+            ? "main company-profile-main"
+            : isCommonUpload
+              ? "main upload-center-main"
+              : "main"
+      }>
+        {!isHseMasterDashboard && !isShelllessPage && (
+          <header className="topbar">
+            <div className="topbar-title">
+              <span className="logo-mark topbar-logo">
+                <img src={companyLogoSrc} alt="LAUGFS Rubber" />
+              </span>
+              <div>
+                <p>{getPageGroup(page)}</p>
+                <h1>{getPageLabel(page)}</h1>
+                <small>{isCompanyProfile ? "Shared company profile" : appName}</small>
+              </div>
             </div>
-          </div>
-          <div className="userbox">
-            <div>
-              <span>{user.name}</span>
-              <small>{user.role.replace(/_/g, " ")}</small>
+            <div className="userbox">
+              <div>
+                <span>{user.name}</span>
+                <small>{user.role.replace(/_/g, " ")}</small>
+              </div>
+              <button onClick={handleLogout}>Logout</button>
             </div>
-            <button onClick={handleLogout}>Logout</button>
-          </div>
-        </header>}
+          </header>
+        )}
         {renderPage()}
       </main>
     </div>
