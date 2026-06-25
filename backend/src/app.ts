@@ -14,9 +14,11 @@ import { medicalRouter } from "./modules/medical/medical.routes";
 import { observationsRouter } from "./modules/observations/observations.routes";
 import { workingHoursRouter } from "./modules/working-hours/working-hours.routes";
 import { dashboardRouter } from "./modules/dashboard/dashboard.routes";
+import { esgRouter } from "./modules/esg/esg.routes.js";
 import { reportsRouter } from "./modules/reports/reports.routes";
 import { tvDashboardRouter } from "./modules/tv-dashboard/tv.routes";
 import { attachmentsRouter } from "./modules/attachments/attachments.routes";
+import { importsRouter } from "./modules/imports/imports.routes.js";
 
 export const app = express();
 
@@ -34,9 +36,11 @@ app.use("/api/medical-expenses", medicalRouter);
 app.use("/api/observations", observationsRouter);
 app.use("/api/working-hours", workingHoursRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/esg", esgRouter);
 app.use("/api/reports", reportsRouter);
 app.use("/api/tv", tvDashboardRouter);
 app.use("/api/attachments", attachmentsRouter);
+app.use("/api/imports", importsRouter);
 
 const tvDir = path.resolve(process.cwd(), "../tv-display");
 app.use("/tv-assets", express.static(tvDir));
@@ -44,3 +48,5 @@ app.get("/tv", (_req, res) => res.sendFile(path.join(tvDir, "tv.html")));
 
 app.use((_req, res) => res.status(404).json({ message: "Route not found" }));
 app.use(errorHandler);
+
+

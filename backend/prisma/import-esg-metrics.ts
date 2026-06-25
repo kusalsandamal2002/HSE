@@ -4,7 +4,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,6 +33,55 @@ type ParsedSheet = {
   rows: string[][];
 };
 
+type EsgTrendPoint = {
+  label: string;
+  year: number;
+  value: number;
+};
+
+type EsgNoisePoint = {
+  label: string;
+  year: number;
+  day: number;
+  dayStandard: number;
+  night: number;
+  nightStandard: number;
+};
+
+type EsgConcernPoint = {
+  name: string;
+  count: number;
+};
+
+type EsgDashboardPayload = {
+  year: number;
+  sourceFile: string;
+  sourcePath: string;
+  sourceSheet: string;
+  periodLabel: string;
+  tracked: boolean;
+  importedAt: string;
+  kpis: {
+    ghgIntensity: { value: number; target: number; label: string; status: string };
+    scrapFlashWaste: { value: number; target: number; label: string; status: string };
+    wasteRecycling: { value: number; target: number; label: string; status: string };
+    externalNoiseDay: { value: number; standard: number; label: string; status: string };
+    externalNoiseNight: { value: number; standard: number; label: string; status: string };
+    tf: { total: number; rate: number; label: string; periodLabel: string; source: string; status: string };
+    ts: { total: number; rate: number; label: string; periodLabel: string; source: string; status: string };
+    stakeholderConcerns: { total: number; label: string; topConcern: EsgConcernPoint | null; status: string };
+  };
+  charts: {
+    ghgIntensityTrend: EsgTrendPoint[];
+    scrapFlashWasteTrend: EsgTrendPoint[];
+    wasteRecyclingTrend: EsgTrendPoint[];
+    noiseTrend: EsgNoisePoint[];
+    tfTrend: EsgTrendPoint[];
+    tsTrend: EsgTrendPoint[];
+    stakeholderConcerns: EsgConcernPoint[];
+  };
+};
+
 type MetricKey = keyof Pick<TfTsRecord, "tfTotal" | "tfRate" | "tsTotal" | "tsRate">;
 
 const METRIC_KEYS: MetricKey[] = ["tfTotal", "tfRate", "tsTotal", "tsRate"];
@@ -52,7 +101,7 @@ function fail(message: string): never {
 }
 
 function resolveWorkbookPath() {
-  const explicit = process.env.ESG_METRICS_WORKBOOK?.trim();
+  const explicit = process.env.IMPORT_WORKBOOK_PATH?.trim() || process.env.ESG_METRICS_WORKBOOK?.trim();
   const candidates = [
     explicit,
     ...SOURCE_FALLBACKS.flatMap((fileName) => [
@@ -366,6 +415,251 @@ function extractTfTsMetrics(sheets: ParsedSheet[], workbookPath: string): TfTsRe
   };
 }
 
+function rowText(row: string[]) {
+  return normalizeComparableText(row.join(" "));
+}
+
+function findRowIndex(rows: string[][], matcher: (row: string[]) => boolean, start = 0) {
+  for (let index = start; index < rows.length; index += 1) {
+    if (matcher(rows[index] || [])) return index;
+  }
+  return -1;
+}
+
+function parseYearLabel(value: unknown) {
+  const match = normalizeComparableText(value).match(/20\d{2}/);
+  return match ? Number(match[0]) : null;
+}
+
+function stripPeriodLabel(value: unknown) {
+  const text = String(value ?? "").trim();
+  return text.replace(/^\d{4}\s*/g, "").replace(/^\((.*)\)$/, "$1").trim();
+}
+
+function displayLabel(value: unknown) {
+  const text = String(value ?? "").trim();
+  const year = parseYearLabel(text);
+  const period = stripPeriodLabel(text);
+  if (!period || period === String(year || "")) return String(year || period || text || "");
+  return year ? `${year} ${period}` : period;
+}
+
+function extractSimpleTrend(rows: string[][], headerMatcher: (row: string[]) => boolean, stopMatcher: ((row: string[]) => boolean) | null) {
+  const headerIndex = findRowIndex(rows, headerMatcher);
+  if (headerIndex < 0) return null;
+
+  const stopIndex = stopMatcher ? findRowIndex(rows, stopMatcher, headerIndex + 1) : -1;
+  const endIndex = stopIndex >= 0 ? stopIndex : rows.length;
+  const series: EsgTrendPoint[] = [];
+
+  for (let index = headerIndex + 1; index < endIndex; index += 1) {
+    const row = rows[index] || [];
+    const label = String(row[0] ?? "").trim();
+    const numeric = parseNumeric(row[1]);
+    if (!label || numeric === null) continue;
+    if (normalizeText(label).startsWith("target")) continue;
+    series.push({ label, year: parseYearLabel(label) ?? YEAR, value: numeric });
+  }
+
+  if (!series.length) return null;
+
+  return {
+    series,
+    target: stopIndex >= 0 && normalizeText(rows[stopIndex]?.[0] ?? "").startsWith("target") ? parseNumeric(rows[stopIndex]?.[1]) : null,
+  };
+}
+
+function extractNoiseTrend(rows: string[][]) {
+  const startIndex = findRowIndex(rows, (row) => {
+    const text = rowText(row);
+    return text.includes("loc a") && text.includes("day time") && text.includes("night time");
+  });
+
+  if (startIndex < 0) return null;
+
+  const stopIndex = findRowIndex(rows, (row) => rowText(row).startsWith("target day time"), startIndex + 1);
+  const endIndex = stopIndex >= 0 ? stopIndex : rows.length;
+  const series: EsgNoisePoint[] = [];
+
+  for (let index = startIndex + 1; index < endIndex; index += 1) {
+    const row = rows[index] || [];
+    const label = String(row[0] ?? "").trim();
+    if (!label || normalizeText(label).startsWith("target")) continue;
+
+    const day = parseNumeric(row[1]);
+    const dayStandard = parseNumeric(row[2]);
+    const night = parseNumeric(row[3]);
+    const nightStandard = parseNumeric(row[4]);
+    if (day === null || dayStandard === null || night === null || nightStandard === null) continue;
+
+    series.push({
+      label,
+      year: parseYearLabel(label) ?? YEAR,
+      day,
+      dayStandard,
+      night,
+      nightStandard,
+    });
+  }
+
+  if (!series.length) return null;
+
+  return { series };
+}
+
+function extractConcerns(rows: string[][]) {
+  const startIndex = findRowIndex(rows, (row) => {
+    const text = rowText(row);
+    return text.includes("category") && text.includes("no of concerns");
+  });
+
+  if (startIndex < 0) return null;
+
+  const series: EsgConcernPoint[] = [];
+  for (let index = startIndex + 1; index < rows.length; index += 1) {
+    const row = rows[index] || [];
+    const name = String(row[0] ?? "").trim();
+    const count = parseNumeric(row[1]);
+    if (!name) break;
+    if (count === null) continue;
+    series.push({ name, count });
+  }
+
+  if (!series.length) return null;
+
+  const topConcern = [...series].sort((a, b) => b.count - a.count)[0] || null;
+  const total = series.reduce((sum, item) => sum + item.count, 0);
+  return { series, topConcern, total };
+}
+
+function extractEsgDashboard(sheets: ParsedSheet[], workbookPath: string): EsgDashboardPayload {
+  const sheet = sheets.find((candidate) => candidate.rows.some((row) => rowText(row).includes("ghg emmission"))) || sheets[0];
+  if (!sheet) {
+    fail("ESG workbook did not contain any sheets.");
+  }
+
+  const rows = sheet.rows;
+  const ghg = extractSimpleTrend(
+    rows,
+    (row) => rowText(row).includes("ghg emmission"),
+    (row) => rowText(row).startsWith("target"),
+  );
+  const scrap = extractSimpleTrend(
+    rows,
+    (row) => rowText(row).includes("scrapped flash waste"),
+    (row) => rowText(row).startsWith("target"),
+  );
+  const waste = extractSimpleTrend(
+    rows,
+    (row) => rowText(row).includes("waste recycling"),
+    (row) => rowText(row).startsWith("target"),
+  );
+  const noise = extractNoiseTrend(rows);
+  const tf = extractSimpleTrend(
+    rows,
+    (row) => rowText(row).includes("tf total fatalities"),
+    (row) => rowText(row).includes("ts total recordable cases"),
+  );
+  const ts = extractSimpleTrend(
+    rows,
+    (row) => rowText(row).includes("ts total recordable cases"),
+    (row) => rowText(row).includes("category") && rowText(row).includes("no of concerns"),
+  );
+  const concerns = extractConcerns(rows);
+
+  if (!ghg || !scrap || !waste || !noise || !tf || !ts || !concerns) {
+    fail("ESG workbook layout was not recognized. Verify the workbook contents and section labels.");
+  }
+
+  const sourceFile = path.basename(workbookPath);
+  const sourceSheet = sheet.name;
+  const reportingPeriod = stripPeriodLabel(waste.series[waste.series.length - 1]?.label || noise.series[noise.series.length - 1]?.label || `${YEAR}`);
+  const ghgLatest = ghg.series[ghg.series.length - 1];
+  const scrapLatest = scrap.series[scrap.series.length - 1];
+  const wasteLatest = waste.series[waste.series.length - 1];
+  const noiseLatest = noise.series[noise.series.length - 1];
+  const tfLatest = tf.series[tf.series.length - 1];
+  const tsLatest = ts.series[ts.series.length - 1];
+
+  return {
+    year: YEAR,
+    sourceFile,
+    sourcePath: workbookPath,
+    sourceSheet,
+    periodLabel: reportingPeriod,
+    tracked: true,
+    importedAt: new Date().toISOString(),
+    kpis: {
+      ghgIntensity: {
+        value: Number(ghgLatest.value.toFixed(2)),
+        target: Number((ghg.target ?? 0).toFixed(2)),
+        label: displayLabel(ghgLatest.label),
+        status: ghgLatest.value <= Number(ghg.target ?? 0) ? "Better than target" : "Above target",
+      },
+      scrapFlashWaste: {
+        value: Number(scrapLatest.value.toFixed(2)),
+        target: Number((scrap.target ?? 0).toFixed(2)),
+        label: displayLabel(scrapLatest.label),
+        status: scrapLatest.value <= Number(scrap.target ?? 0) ? "Better than target" : "Above target",
+      },
+      wasteRecycling: {
+        value: Number(wasteLatest.value.toFixed(2)),
+        target: Number((waste.target ?? 0).toFixed(2)),
+        label: displayLabel(wasteLatest.label),
+        status: wasteLatest.value >= Number(waste.target ?? 0) ? "On target" : "Below target",
+      },
+      externalNoiseDay: {
+        value: Number(noiseLatest.day.toFixed(2)),
+        standard: Number(noiseLatest.dayStandard.toFixed(2)),
+        label: displayLabel(noiseLatest.label),
+        status: noiseLatest.day <= noiseLatest.dayStandard ? "Within standard" : "Above standard",
+      },
+      externalNoiseNight: {
+        value: Number(noiseLatest.night.toFixed(2)),
+        standard: Number(noiseLatest.nightStandard.toFixed(2)),
+        label: displayLabel(noiseLatest.label),
+        status: noiseLatest.night <= noiseLatest.nightStandard ? "Within standard" : "Above standard",
+      },
+      tf: {
+        total: Number(tfLatest.value || 0),
+        rate: 0,
+        label: displayLabel(tfLatest.label),
+        periodLabel: displayLabel(tfLatest.label),
+        source: sourceFile,
+        status: Number(tfLatest.value || 0) === 0 ? "Zero fatalities" : "Fatalities recorded",
+      },
+      ts: {
+        total: Number(tsLatest.value || 0),
+        rate: 0,
+        label: displayLabel(tsLatest.label),
+        periodLabel: displayLabel(tsLatest.label),
+        source: sourceFile,
+        status: Number(tsLatest.value || 0) === 0 ? "Zero in 2026" : "Cases recorded",
+      },
+      stakeholderConcerns: {
+        total: concerns.total,
+        label: String(YEAR),
+        topConcern: concerns.topConcern,
+        status: concerns.topConcern ? `Highest concern: ${concerns.topConcern.name} (${concerns.topConcern.count})` : "No concerns tracked",
+      },
+    },
+    charts: {
+      ghgIntensityTrend: ghg.series.map((item) => ({ ...item, value: Number(item.value.toFixed(2)) })),
+      scrapFlashWasteTrend: scrap.series.map((item) => ({ ...item, value: Number(item.value.toFixed(2)) })),
+      wasteRecyclingTrend: waste.series.map((item) => ({ ...item, value: Number(item.value.toFixed(2)) })),
+      noiseTrend: noise.series.map((item) => ({
+        ...item,
+        day: Number(item.day.toFixed(2)),
+        dayStandard: Number(item.dayStandard.toFixed(2)),
+        night: Number(item.night.toFixed(2)),
+        nightStandard: Number(item.nightStandard.toFixed(2)),
+      })),
+      tfTrend: tf.series.map((item) => ({ ...item, value: Number(item.value || 0) })),
+      tsTrend: ts.series.map((item) => ({ ...item, value: Number(item.value || 0) })),
+      stakeholderConcerns: concerns.series.map((item) => ({ name: item.name, count: Number(item.count || 0) })),
+    },
+  };
+}
 async function main() {
   const workbookPath = resolveWorkbookPath();
   const extractedRoot = extractWorkbookZip(workbookPath);
@@ -386,6 +680,7 @@ async function main() {
     });
 
     const metric = extractTfTsMetrics(sheets, workbookPath);
+    const dashboard = extractEsgDashboard(sheets, workbookPath);
     const upserted = await prisma.tfTsMetric.upsert({
       where: { year: YEAR },
       update: {
@@ -408,6 +703,36 @@ async function main() {
         tracked: true,
       },
     });
+    const snapshot = await prisma.esgDashboardSnapshot.upsert({
+      where: { year: YEAR },
+      update: {
+        sourceFile: dashboard.sourceFile,
+        sourcePath: dashboard.sourcePath,
+        sourceSheet: dashboard.sourceSheet,
+        periodLabel: dashboard.periodLabel,
+        tracked: dashboard.tracked,
+        payload: dashboard as Prisma.InputJsonValue,
+      },
+      create: {
+        year: dashboard.year,
+        sourceFile: dashboard.sourceFile,
+        sourcePath: dashboard.sourcePath,
+        sourceSheet: dashboard.sourceSheet,
+        periodLabel: dashboard.periodLabel,
+        tracked: dashboard.tracked,
+        payload: dashboard as Prisma.InputJsonValue,
+      },
+    });
+
+    console.log("ESG dashboard snapshot imported");
+    console.log(`Dashboard year: ${snapshot.year}`);
+    console.log(`Dashboard period: ${snapshot.periodLabel}`);
+    console.log(`Dashboard source: ${snapshot.sourceFile}`);
+    console.log(`Dashboard sheet: ${snapshot.sourceSheet}`);
+    console.log(`GHG latest: ${dashboard.kpis.ghgIntensity.value}`);
+    console.log(`Waste recycling latest: ${dashboard.kpis.wasteRecycling.value}`);
+    console.log(`TF Total: ${dashboard.kpis.tf.total}`);
+    console.log(`TS Total: ${dashboard.kpis.ts.total}`);
 
     console.log("TF/TS import complete");
     console.log(`Workbook: ${workbookPath}`);
@@ -428,3 +753,6 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+
+

@@ -50,6 +50,36 @@ enum AttachmentOwnerType {
   OBSERVATION
 }
 
+
+enum ImportWorkbookType {
+  HSE_ACCIDENT_SUMMARY
+  ESG_METRICS
+  UNKNOWN
+}
+
+enum ImportBatchStatus {
+  UPLOADED
+  SCANNED
+  VALIDATION_FAILED
+  READY_FOR_APPROVAL
+  APPROVED
+  IMPORTED
+  CANCELLED
+  FAILED
+}
+
+enum ImportIssueSeverity {
+  INFO
+  WARNING
+  ERROR
+}
+
+enum ImportPreviewRowStatus {
+  VALID
+  WARNING
+  REJECTED
+}
+
 model User {
   id           String   @id @default(uuid())
   name         String
@@ -293,6 +323,113 @@ model TfTsMetric {
   updatedAt   DateTime @updatedAt
 }
 
+model ImportBatch {
+  id            String             @id @default(uuid())
+  fileName      String
+  originalName  String
+  fileHash      String
+  workbookType  ImportWorkbookType  @default(UNKNOWN)
+  status        ImportBatchStatus   @default(UPLOADED)
+  uploadedBy    String?
+  uploadedAt    DateTime           @default(now())
+  approvedBy    String?
+  approvedAt    DateTime?
+  importedAt    DateTime?
+  rowCount      Int                @default(0)
+  validRowCount Int                @default(0)
+  warningCount  Int                @default(0)
+  errorCount    Int                @default(0)
+  summaryJson   Json?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  file             ImportFile?
+  detectedSections ImportDetectedSection[]
+  previewRows      ImportPreviewRow[]
+  validationIssues ImportValidationIssue[]
+
+  @@index([fileHash])
+  @@index([workbookType, status])
+  @@index([uploadedAt])
+}
+
+model ImportFile {
+  id           String   @id @default(uuid())
+  batchId      String   @unique
+  originalName String
+  storedName   String
+  mimeType     String
+  sizeBytes    Int
+  path         String
+  sha256       String
+  createdAt    DateTime @default(now())
+
+  batch ImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([sha256])
+}
+
+model ImportDetectedSection {
+  id           String   @id @default(uuid())
+  batchId      String
+  sectionKey   String
+  sectionLabel String
+  sheetName    String?
+  confidence   Float    @default(0)
+  rowCount     Int      @default(0)
+  summary      String?
+  metadataJson Json?
+  createdAt    DateTime @default(now())
+
+  batch ImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([batchId, sectionKey])
+}
+
+model ImportPreviewRow {
+  id             String                 @id @default(uuid())
+  batchId        String
+  sectionKey     String
+  rowIndex       Int
+  rawJson        Json
+  mappedJson     Json
+  status         ImportPreviewRowStatus @default(VALID)
+  validationJson  Json?
+  createdAt      DateTime               @default(now())
+
+  batch ImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([batchId, sectionKey, rowIndex])
+}
+
+model ImportValidationIssue {
+  id          String             @id @default(uuid())
+  batchId     String
+  sectionKey  String?
+  severity    ImportIssueSeverity
+  code        String
+  message     String
+  detailsJson Json?
+  createdAt   DateTime           @default(now())
+
+  batch ImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([batchId, severity])
+}
+
+model EsgDashboardSnapshot {
+  id          String   @id @default(uuid())
+  year        Int      @unique
+  sourceFile  String
+  sourcePath  String?
+  sourceSheet String?
+  periodLabel String
+  tracked     Boolean  @default(false)
+  payload     Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Attachment {
   id          String              @id @default(uuid())
   ownerType   AttachmentOwnerType
@@ -317,3 +454,4 @@ model AuditLog {
 
   user User? @relation(fields: [userId], references: [id])
 }
+
