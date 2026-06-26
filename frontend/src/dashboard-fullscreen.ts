@@ -17,20 +17,32 @@ function getDashboardMode(): DashboardMode | null {
   return dashboardRoutes[pathname] ?? null;
 }
 
-function setPresentationMode(active: boolean, button: HTMLButtonElement) {
+function removeOldExecutiveOverlay() {
+  document.querySelector(".executive-presentation-overlay")?.remove();
+}
+
+function setPresentationMode(active: boolean, button: HTMLButtonElement, browserFullscreen = true) {
+  const mode = getDashboardMode();
+
+  removeOldExecutiveOverlay();
+
   document.documentElement.classList.toggle("dashboard-presentation-mode", active);
   document.body.classList.toggle("dashboard-presentation-mode", active);
+
+  if (mode) {
+    document.body.dataset.dashboardScreen = mode;
+  }
 
   button.classList.toggle("is-active", active);
   button.textContent = active ? "EXIT" : "⛶";
   button.title = active ? "Exit presentation view" : "Open presentation view";
   button.setAttribute("aria-label", active ? "Exit presentation view" : "Open presentation view");
 
-  if (active) {
+  if (browserFullscreen && active) {
     document.documentElement.requestFullscreen?.().catch(() => {
       // CSS presentation mode still works if browser fullscreen is blocked.
     });
-  } else if (document.fullscreenElement) {
+  } else if (browserFullscreen && !active && document.fullscreenElement) {
     document.exitFullscreen?.().catch(() => {
       // Ignore browser fullscreen exit restrictions.
     });
@@ -39,6 +51,8 @@ function setPresentationMode(active: boolean, button: HTMLButtonElement) {
 
 function syncDashboardFullscreenButton(button: HTMLButtonElement) {
   const mode = getDashboardMode();
+
+  removeOldExecutiveOverlay();
 
   if (!mode) {
     button.style.display = "none";
@@ -88,9 +102,16 @@ function installDashboardFullscreenButton() {
 
   window.addEventListener("popstate", () => syncDashboardFullscreenButton(button));
   window.addEventListener("click", () => setTimeout(() => syncDashboardFullscreenButton(button), 50));
+
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && document.body.classList.contains("dashboard-presentation-mode")) {
       setPresentationMode(false, button);
+    }
+  });
+
+  document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement && document.body.classList.contains("dashboard-presentation-mode")) {
+      setPresentationMode(false, button, false);
     }
   });
 

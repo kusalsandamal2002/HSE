@@ -1,0 +1,872 @@
+﻿/* =========================================================
+   APP-WIDE RESPONSIVE FOUNDATION
+   Purpose:
+   - Whole app adapts to window size
+   - Cards/forms/tables/grids avoid cutting
+   - Dashboards keep their specific styles, but app gets a responsive base
+========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+}
+
+:root {
+  --app-sidebar-width: clamp(230px, 17vw, 290px);
+  --app-page-padding: clamp(10px, 1.2vw, 20px);
+  --app-card-padding: clamp(10px, 1vw, 18px);
+  --app-gap: clamp(8px, 1vw, 16px);
+  --app-radius: clamp(12px, 1vw, 18px);
+  --app-text-xs: clamp(0.68rem, 0.58rem + 0.25vw, 0.82rem);
+  --app-text-sm: clamp(0.78rem, 0.68rem + 0.28vw, 0.95rem);
+  --app-text-md: clamp(0.95rem, 0.82rem + 0.36vw, 1.15rem);
+  --app-text-lg: clamp(1.15rem, 0.95rem + 0.65vw, 1.65rem);
+  --app-text-xl: clamp(1.45rem, 1.1rem + 1.2vw, 2.35rem);
+}
+
+/* ---------- App shell ---------- */
+
+.app-shell {
+  width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
+}
+
+.sidebar {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.main {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding: var(--app-page-padding);
+}
+
+/* ---------- General page layout ---------- */
+
+.page-stack,
+.esg-page,
+.company-profile-main,
+.upload-center-main,
+.master-main {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.page-stack {
+  gap: var(--app-gap);
+}
+
+.panel,
+.kpi,
+.master-panel,
+.master-kpi,
+.esg-panel,
+.esg-metric,
+.company-context-card,
+.data-card,
+.report-card,
+.upload-card {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  border-radius: var(--app-radius);
+}
+
+.panel,
+.company-context-card,
+.esg-panel {
+  padding: var(--app-card-padding);
+}
+
+/* ---------- Responsive grids ---------- */
+
+.grid.two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: var(--app-gap);
+}
+
+.kpi-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--app-gap);
+}
+
+.company-context-grid,
+.esg-page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: var(--app-gap);
+}
+
+/* ---------- Text scaling ---------- */
+
+h1 {
+  font-size: var(--app-text-xl);
+}
+
+h2 {
+  font-size: var(--app-text-lg);
+}
+
+h3,
+strong {
+  max-width: 100%;
+}
+
+p,
+small,
+span,
+label,
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+/* ---------- Forms ---------- */
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+.filters,
+.form-grid,
+.profile-grid,
+.upload-grid {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: var(--app-gap);
+}
+
+/* ---------- Tables ---------- */
+
+.table-panel,
+.monthly-kpi-table,
+.esg-panel:has(table),
+.panel:has(table) {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-panel table,
+.esg-table {
+  min-width: 760px;
+}
+
+/* ---------- Charts ---------- */
+
+.recharts-wrapper,
+.recharts-surface {
+  max-width: 100%;
+}
+
+.chart-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ---------- Dashboard normal-screen safety ---------- */
+
+.master-dashboard,
+.esg-dashboard {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.master-chart-grid,
+.esg-chart-grid,
+.master-kpi-strip,
+.esg-kpi-strip,
+.executive-strip,
+.esg-strip {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ---------- Medium screens ---------- */
+
+@media (max-width: 1200px) {
+  :root {
+    --app-sidebar-width: 220px;
+    --app-page-padding: 10px;
+    --app-gap: 8px;
+  }
+
+  .app-shell {
+    grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
+  }
+
+  .kpi-list {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  }
+
+  .grid.two {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Small laptop / split-window screens ---------- */
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 2000;
+    width: 100%;
+    max-height: 42dvh;
+    border-right: 0;
+    border-bottom: 1px solid rgba(53, 246, 255, 0.16);
+  }
+
+  .main {
+    padding: 8px;
+  }
+
+  .filters,
+  .company-context-grid,
+  .esg-page-grid,
+  .kpi-list,
+  .grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .table-panel table,
+  .esg-table {
+    min-width: 680px;
+  }
+}
+
+/* ---------- Phone-sized fallback ---------- */
+
+@media (max-width: 560px) {
+  :root {
+    --app-card-padding: 10px;
+    --app-gap: 7px;
+  }
+
+  .main {
+    padding: 6px;
+  }
+
+  .sidebar {
+    max-height: 50dvh;
+  }
+
+  .panel,
+  .kpi,
+  .company-context-card,
+  .esg-panel {
+    padding: 10px;
+  }
+
+  .table-panel table,
+  .esg-table {
+    min-width: 620px;
+  }
+
+  h1 {
+    font-size: clamp(1.25rem, 5vw, 1.65rem);
+  }
+
+  h2 {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+  }
+}
+
+/* ---------- Presentation mode should remain full-screen ---------- */
+
+body.dashboard-presentation-mode .sidebar {
+  display: none !important;
+}
+
+body.dashboard-presentation-mode .main {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   STEP 4B - APP-WIDE RESPONSIVE SIDEBAR + MAIN POLISH
+   Purpose:
+   - Improve app behavior in split-window / laptop / tablet widths
+   - Reduce sidebar heaviness
+   - Keep cards readable without cutting
+========================================================= */
+
+/* Desktop sidebar remains strong but flexible */
+.sidebar {
+  width: var(--app-sidebar-width);
+  max-width: var(--app-sidebar-width);
+}
+
+.sidebar-brand {
+  gap: clamp(8px, 1vw, 14px);
+}
+
+.sidebar-logo {
+  width: clamp(58px, 5vw, 82px);
+  height: clamp(46px, 4.2vw, 64px);
+  flex: 0 0 auto;
+}
+
+.sidebar .brand h1,
+.sidebar-brand h1 {
+  font-size: clamp(1.25rem, 1vw + 0.75rem, 1.85rem);
+  line-height: 1;
+}
+
+.sidebar .brand p,
+.sidebar-brand p {
+  font-size: clamp(0.72rem, 0.35vw + 0.55rem, 0.95rem);
+}
+
+.sidebar-section-title {
+  font-size: clamp(0.7rem, 0.24vw + 0.62rem, 0.82rem);
+}
+
+.sidebar button {
+  min-width: 0;
+  font-size: clamp(0.76rem, 0.28vw + 0.64rem, 0.95rem);
+  white-space: normal;
+  line-height: 1.2;
+}
+
+/* Main content must never create horizontal cut */
+.main,
+.master-main,
+.company-profile-main,
+.upload-center-main {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Slightly tighter dashboard/cards in split window */
+@media (max-width: 1400px) {
+  :root {
+    --app-sidebar-width: 230px;
+    --app-page-padding: 9px;
+    --app-card-padding: 10px;
+    --app-gap: 7px;
+  }
+
+  .sidebar {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .sidebar-logo {
+    width: 58px;
+    height: 46px;
+  }
+
+  .sidebar button {
+    padding: 10px 12px;
+  }
+}
+
+/* True split-window behavior */
+@media (max-width: 1050px) {
+  :root {
+    --app-sidebar-width: 190px;
+    --app-page-padding: 8px;
+    --app-card-padding: 9px;
+    --app-gap: 7px;
+  }
+
+  .app-shell {
+    grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
+  }
+
+  .sidebar {
+    width: var(--app-sidebar-width);
+    max-width: var(--app-sidebar-width);
+    padding: 10px 8px;
+  }
+
+  .sidebar-logo {
+    width: 48px;
+    height: 38px;
+  }
+
+  .sidebar .brand h1,
+  .sidebar-brand h1 {
+    font-size: 1.05rem;
+  }
+
+  .sidebar .brand p,
+  .sidebar-brand p {
+    font-size: 0.68rem;
+  }
+
+  .sidebar-section {
+    margin-top: 14px;
+  }
+
+  .sidebar-section-title {
+    font-size: 0.66rem;
+  }
+
+  .sidebar button {
+    padding: 8px 9px;
+    font-size: 0.72rem;
+  }
+
+  .sidebar-foot {
+    font-size: 0.66rem;
+  }
+}
+
+/* Small screens: sidebar becomes top navigation area */
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+    padding: 8px;
+    display: block;
+    border-right: 0;
+    border-bottom: 1px solid rgba(53, 246, 255, 0.18);
+  }
+
+  .sidebar-brand {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-logo {
+    width: 44px;
+    height: 34px;
+  }
+
+  .sidebar-section {
+    margin-top: 8px;
+  }
+
+  .sidebar-section-title {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .sidebar-section nav,
+  .sidebar-section div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar button {
+    width: auto;
+    min-width: max-content;
+    padding: 7px 9px;
+    font-size: 0.7rem;
+    border-radius: 10px;
+  }
+
+  .sidebar-foot {
+    display: none;
+  }
+
+  .main {
+    padding: 7px;
+  }
+}
+
+/* Very narrow: keep app usable */
+@media (max-width: 520px) {
+  .sidebar-section nav,
+  .sidebar-section div {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+
+  .sidebar button {
+    white-space: nowrap;
+  }
+
+  .main {
+    padding: 6px;
+  }
+}
+
+/* =========================================================
+   STEP 4C - APP-WIDE CARD + DASHBOARD RESPONSIVE REFLOW
+   Purpose:
+   - Cards auto-resize by window width
+   - Dashboards switch from screen-fit board to scrollable responsive layout on narrow windows
+   - Prevent chart/card/text cutting in normal app mode
+========================================================= */
+
+/* ---------- Generic card behavior ---------- */
+
+.kpi,
+.master-kpi,
+.esg-metric,
+.panel,
+.master-panel,
+.esg-panel,
+.company-context-card,
+.report-card,
+.data-card,
+.upload-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.kpi strong,
+.master-kpi strong,
+.esg-metric strong,
+.executive-chip strong,
+.esg-strip-card strong {
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.kpi small,
+.master-kpi small,
+.esg-metric small,
+.executive-chip span,
+.esg-strip-card span {
+  white-space: normal !important;
+}
+
+/* ---------- Normal Executive Dashboard responsive behavior ---------- */
+
+@media (max-width: 1200px) {
+  body:not(.dashboard-presentation-mode) .page-stack {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .company-dashboard-heading {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .company-dashboard-heading h1 {
+    font-size: clamp(1.25rem, 2.4vw, 1.85rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .kpi-list {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)) !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .kpi {
+    min-height: 96px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body:not(.dashboard-presentation-mode) .company-dashboard-heading {
+    grid-template-columns: 52px minmax(0, 1fr) !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .company-dashboard-heading .userbox {
+    grid-column: 1 / -1 !important;
+    justify-self: stretch !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .kpi-list {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)) !important;
+  }
+}
+
+/* ---------- HSE Master Dashboard normal responsive reflow ---------- */
+
+/* On wide windows, keep existing board look. On narrow windows, become responsive vertical app layout. */
+@media (max-width: 1250px) {
+  body:not(.dashboard-presentation-mode) .master-main {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-dashboard {
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: grid !important;
+    grid-template-rows: auto auto auto auto auto !important;
+    gap: 8px !important;
+    padding: 8px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-hero {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 7px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-brand-block,
+  body:not(.dashboard-presentation-mode) .master-status-card,
+  body:not(.dashboard-presentation-mode) .master-filter-card {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-brand-block h1 {
+    font-size: clamp(1.35rem, 3.6vw, 2rem) !important;
+    line-height: 1 !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-kpi-strip {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)) !important;
+    gap: 7px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-kpi {
+    height: auto !important;
+    min-height: 74px !important;
+    max-height: none !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-chart-grid {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)) !important;
+    gap: 8px !important;
+    overflow: visible !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-panel {
+    height: auto !important;
+    min-height: 220px !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-panel .recharts-responsive-container {
+    min-height: 170px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .executive-strip {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .executive-chip {
+    height: auto !important;
+    min-height: 44px !important;
+  }
+}
+
+/* ---------- ESG Master Dashboard normal responsive reflow ---------- */
+
+@media (max-width: 1250px) {
+  body:not(.dashboard-presentation-mode) .esg-dashboard {
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: grid !important;
+    grid-template-rows: auto auto auto auto !important;
+    gap: 8px !important;
+    padding: 8px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-hero {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 7px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-brand-block,
+  body:not(.dashboard-presentation-mode) .esg-clock-card,
+  body:not(.dashboard-presentation-mode) .esg-filter-card {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-brand-block h1 {
+    font-size: clamp(1.35rem, 3.6vw, 2rem) !important;
+    line-height: 1 !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-kpi-strip {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)) !important;
+    gap: 7px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-metric {
+    height: auto !important;
+    min-height: 76px !important;
+    max-height: none !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-chart-grid {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)) !important;
+    gap: 8px !important;
+    overflow: visible !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-panel {
+    height: auto !important;
+    min-height: 220px !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-panel .recharts-responsive-container {
+    min-height: 170px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-strip {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .esg-strip-lead,
+  body:not(.dashboard-presentation-mode) .esg-strip-card {
+    height: auto !important;
+    min-height: 42px !important;
+    max-height: none !important;
+  }
+}
+
+/* ---------- Very narrow dashboard safety ---------- */
+
+@media (max-width: 760px) {
+  body:not(.dashboard-presentation-mode) .master-chart-grid,
+  body:not(.dashboard-presentation-mode) .esg-chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-panel,
+  body:not(.dashboard-presentation-mode) .esg-panel {
+    min-height: 240px !important;
+  }
+
+  body:not(.dashboard-presentation-mode) .master-kpi-strip,
+  body:not(.dashboard-presentation-mode) .esg-kpi-strip,
+  body:not(.dashboard-presentation-mode) .executive-strip,
+  body:not(.dashboard-presentation-mode) .esg-strip {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ---------- Data entry / reports / profile card responsiveness ---------- */
+
+@media (max-width: 1000px) {
+  .data-entry-grid,
+  .report-grid,
+  .profile-grid,
+  .upload-grid,
+  .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+  }
+
+  .panel:has(table),
+  .table-panel,
+  .monthly-kpi-table {
+    overflow-x: auto !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .data-entry-grid,
+  .report-grid,
+  .profile-grid,
+  .upload-grid,
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .panel:has(table),
+  .table-panel,
+  .monthly-kpi-table {
+    border-radius: 12px !important;
+  }
+}

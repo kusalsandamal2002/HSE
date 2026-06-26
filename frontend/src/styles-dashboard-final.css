@@ -1461,3 +1461,1582 @@ body.dashboard-presentation-mode[data-dashboard-screen="esg"] .esg-dashboard {
     right: 500px !important;
   }
 }
+
+/* =========================================================
+   STEP 3B - FINAL PRESENTATION MODE POLISH
+   Fixes:
+   1. ESG sidebar not hiding
+   2. Executive fullscreen not command-room style
+   3. Fullscreen button overlap
+   4. HSE presentation layout stability
+========================================================= */
+
+/* ---------- Button placement polish ---------- */
+
+body[data-dashboard-screen="executive"] .dashboard-fullscreen-trigger:not(.is-active) {
+  top: 28px !important;
+  right: 320px !important;
+}
+
+body[data-dashboard-screen="master"] .dashboard-fullscreen-trigger:not(.is-active) {
+  top: 22px !important;
+  right: 665px !important;
+}
+
+body[data-dashboard-screen="esg"] .dashboard-fullscreen-trigger:not(.is-active) {
+  top: 22px !important;
+  right: 575px !important;
+}
+
+.dashboard-fullscreen-trigger {
+  backdrop-filter: blur(16px) !important;
+}
+
+.dashboard-fullscreen-trigger.is-active {
+  top: 10px !important;
+  right: 12px !important;
+  z-index: 999999 !important;
+  min-width: 66px !important;
+  height: 32px !important;
+  border-radius: 9px !important;
+  font-size: 12px !important;
+}
+
+
+/* ---------- Universal app-shell fullscreen foundation ---------- */
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .app-shell,
+body.dashboard-presentation-mode[data-dashboard-screen="master"] .app-shell,
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] .app-shell {
+  grid-template-columns: 1fr !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+  background: #020a13 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .sidebar,
+body.dashboard-presentation-mode[data-dashboard-screen="master"] .sidebar,
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] .sidebar {
+  display: none !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  visibility: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .main,
+body.dashboard-presentation-mode[data-dashboard-screen="master"] .main,
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] .main {
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background: #020a13 !important;
+}
+
+
+/* ---------- HSE Master fullscreen stability ---------- */
+
+body.dashboard-presentation-mode[data-dashboard-screen="master"] .master-main {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="master"] .master-dashboard {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="master"] .master-footnote {
+  font-size: 10px !important;
+}
+
+
+/* ---------- ESG fullscreen correct sidebar removal + full width ---------- */
+
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] .esg-dashboard {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  grid-template-rows: 70px 82px minmax(0, 1fr) 42px !important;
+  gap: 5px !important;
+  padding: 5px 7px !important;
+  box-sizing: border-box !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] .esg-hero {
+  height: 70px !important;
+  min-height: 70px !important;
+  max-height: 70px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] .esg-kpi-strip {
+  height: 82px !important;
+  min-height: 82px !important;
+  max-height: 82px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] .esg-chart-grid {
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] .esg-strip {
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  overflow: hidden !important;
+}
+
+
+/* ---------- Executive Dashboard compact presentation mode ---------- */
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding: 10px 12px !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-rows: 82px 66px 132px minmax(0, 1fr) !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Hide long report sections in presentation mode */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack > .grid.two,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .monthly-kpi-table {
+  display: none !important;
+}
+
+/* Header */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+  height: 82px !important;
+  min-height: 82px !important;
+  max-height: 82px !important;
+  padding: 10px 16px !important;
+  margin: 0 !important;
+  border-radius: 14px !important;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  align-items: center !important;
+  gap: 14px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading h1 {
+  font-size: 30px !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading p {
+  font-size: 13px !important;
+  margin: 3px 0 0 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-heading-logo {
+  width: 64px !important;
+  height: 48px !important;
+}
+
+/* Filters */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters {
+  height: 66px !important;
+  min-height: 66px !important;
+  max-height: 66px !important;
+  padding: 9px 14px !important;
+  margin: 0 !important;
+  border-radius: 14px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) !important;
+  gap: 10px !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters label {
+  font-size: 11px !important;
+  gap: 3px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters select,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters input {
+  height: 34px !important;
+  font-size: 14px !important;
+}
+
+/* HSE Performance title area */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .analysis-heading {
+  display: none !important;
+}
+
+/* Company context cards */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-grid {
+  height: 132px !important;
+  min-height: 132px !important;
+  max-height: 132px !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1.25fr !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-card {
+  height: 132px !important;
+  min-height: 132px !important;
+  max-height: 132px !important;
+  padding: 12px 14px !important;
+  overflow: hidden !important;
+  border-radius: 14px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-card h2,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-card h3 {
+  font-size: 17px !important;
+  line-height: 1.08 !important;
+  margin: 0 0 8px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-card p {
+  font-size: 14px !important;
+  line-height: 1.35 !important;
+  margin: 0 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .compact-chip-list {
+  gap: 6px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .info-chip {
+  font-size: 11px !important;
+  padding: 5px 8px !important;
+}
+
+/* KPI command grid */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi-list {
+  height: 100% !important;
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-auto-rows: minmax(84px, 1fr) !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi {
+  min-height: 84px !important;
+  padding: 12px 14px !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(145deg, rgba(7, 28, 46, 0.96), rgba(2, 11, 22, 0.98)) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi span {
+  font-size: 11px !important;
+  letter-spacing: 0.4px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+  font-size: 26px !important;
+  line-height: 1 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi small {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+
+/* ---------- Small-screen snapped browser safety ---------- */
+
+@media (max-width: 1500px) {
+  body[data-dashboard-screen="executive"] .dashboard-fullscreen-trigger:not(.is-active) {
+    top: 24px !important;
+    right: 275px !important;
+  }
+
+  body[data-dashboard-screen="master"] .dashboard-fullscreen-trigger:not(.is-active) {
+    top: 18px !important;
+    right: 545px !important;
+  }
+
+  body[data-dashboard-screen="esg"] .dashboard-fullscreen-trigger:not(.is-active) {
+    top: 18px !important;
+    right: 500px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+    grid-template-rows: 78px 62px 118px minmax(0, 1fr) !important;
+    gap: 7px !important;
+    padding: 8px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-grid,
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-card {
+    height: 118px !important;
+    min-height: 118px !important;
+    max-height: 118px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+    font-size: 22px !important;
+  }
+}
+
+/* =========================================================
+   STEP 3C - EXECUTIVE DASHBOARD TRUE MEETING-ROOM MODE
+   Keep normal page unchanged. Presentation mode becomes compact KPI board.
+========================================================= */
+
+body[data-dashboard-screen="executive"] .dashboard-fullscreen-trigger:not(.is-active) {
+  top: 26px !important;
+  right: 365px !important;
+}
+
+/* Executive fullscreen: strict one-screen layout */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding: 10px 12px !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-rows: 82px 64px minmax(0, 1fr) !important;
+  gap: 9px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Remove report/detail content from presentation mode */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack > h2,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack > p,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack > img,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-grid,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack > .grid.two,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .chart-panel,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .monthly-kpi-table {
+  display: none !important;
+}
+
+/* Executive header presentation size */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+  grid-row: 1 !important;
+  height: 82px !important;
+  min-height: 82px !important;
+  max-height: 82px !important;
+  margin: 0 !important;
+  padding: 10px 16px !important;
+  border-radius: 14px !important;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  align-items: center !important;
+  gap: 14px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading h1 {
+  font-size: 30px !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading p {
+  font-size: 13px !important;
+  line-height: 1.1 !important;
+  margin: 3px 0 0 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading .page-heading-logo {
+  width: 66px !important;
+  height: 48px !important;
+  min-width: 66px !important;
+}
+
+/* Filter strip presentation size */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters {
+  grid-row: 2 !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+  margin: 0 !important;
+  padding: 8px 14px !important;
+  border-radius: 14px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters label {
+  font-size: 11px !important;
+  line-height: 1 !important;
+  gap: 3px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters select,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters input {
+  height: 34px !important;
+  min-height: 34px !important;
+  font-size: 14px !important;
+  border-radius: 10px !important;
+}
+
+/* KPI board fills the remaining screen */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi-list {
+  grid-row: 3 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  grid-auto-rows: minmax(0, 1fr) !important;
+  gap: 10px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi {
+  min-height: 0 !important;
+  height: 100% !important;
+  padding: 16px 18px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at top right, rgba(53, 246, 255, 0.12), transparent 38%),
+    linear-gradient(145deg, rgba(8, 31, 52, 0.98), rgba(2, 10, 20, 0.99)) !important;
+  border: 1px solid rgba(69, 178, 220, 0.34) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 26px rgba(0,0,0,0.22) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi span {
+  font-size: 13px !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.7px !important;
+  text-transform: uppercase !important;
+  color: rgba(190, 222, 255, 0.88) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+  font-size: 36px !important;
+  line-height: 0.95 !important;
+  color: #ffffff !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi small {
+  font-size: 14px !important;
+  line-height: 1.18 !important;
+  color: rgba(158, 207, 255, 0.86) !important;
+}
+
+/* Prevent floating help button from covering KPI cards in presentation */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .floating-help,
+body.dashboard-presentation-mode[data-dashboard-screen="master"] .floating-help,
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] .floating-help {
+  display: none !important;
+}
+
+/* Snapped/smaller browser safety */
+@media (max-width: 1500px) {
+  body[data-dashboard-screen="executive"] .dashboard-fullscreen-trigger:not(.is-active) {
+    top: 24px !important;
+    right: 315px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+    grid-template-rows: 72px 56px minmax(0, 1fr) !important;
+    gap: 7px !important;
+    padding: 8px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+    height: 72px !important;
+    min-height: 72px !important;
+    max-height: 72px !important;
+    padding: 8px 12px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading h1 {
+    font-size: 24px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading p {
+    font-size: 11px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters {
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    padding: 6px 10px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters select,
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters input {
+    height: 30px !important;
+    font-size: 12px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi-list {
+    gap: 7px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi {
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+    gap: 5px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi span {
+    font-size: 9.5px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+    font-size: 23px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi small {
+    font-size: 10px !important;
+  }
+}
+
+/* =========================================================
+   STEP 3D - EXECUTIVE FULLSCREEN FINAL HARD OVERRIDE
+   Goal: remove remaining report/detail elements and show a clean KPI board.
+========================================================= */
+
+/* In Executive presentation mode, only keep:
+   1. page heading
+   2. filters
+   3. KPI list
+*/
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack > :not(.company-dashboard-heading):not(.filters):not(.kpi-list) {
+  display: none !important;
+}
+
+/* Safety hide for remaining report/detail elements */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .analysis-heading,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-grid,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-card,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .chart-panel,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .monthly-kpi-table,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .grid.two {
+  display: none !important;
+}
+
+/* True 3-row command screen */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding: 8px !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-rows: 64px 50px minmax(0, 1fr) !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Header compact */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+  grid-row: 1 !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+  padding: 7px 12px !important;
+  margin: 0 !important;
+  border-radius: 13px !important;
+  display: grid !important;
+  grid-template-columns: 60px minmax(0, 1fr) 150px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading .page-heading-logo {
+  width: 56px !important;
+  height: 42px !important;
+  min-width: 56px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading h1 {
+  font-size: 24px !important;
+  line-height: 0.95 !important;
+  margin: 0 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading p {
+  font-size: 10px !important;
+  line-height: 1 !important;
+  margin: 2px 0 0 !important;
+}
+
+/* Filters compact */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters {
+  grid-row: 2 !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+  margin: 0 !important;
+  padding: 5px 9px !important;
+  border-radius: 12px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters label {
+  font-size: 9px !important;
+  line-height: 1 !important;
+  gap: 2px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters select,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters input {
+  height: 27px !important;
+  min-height: 27px !important;
+  font-size: 11px !important;
+  border-radius: 9px !important;
+  padding: 3px 9px !important;
+}
+
+/* KPI board must fill remaining height */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi-list {
+  grid-row: 3 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi {
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 10px 12px !important;
+  border-radius: 13px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi span {
+  font-size: 9.5px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.4px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+  font-size: 24px !important;
+  line-height: 0.95 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi small {
+  font-size: 10px !important;
+  line-height: 1.12 !important;
+}
+
+/* Move Executive fullscreen button away from admin box */
+body[data-dashboard-screen="executive"] .dashboard-fullscreen-trigger:not(.is-active) {
+  top: 28px !important;
+  right: 390px !important;
+}
+
+/* For snapped browser windows */
+@media (max-width: 1500px) {
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+    grid-template-rows: 58px 44px minmax(0, 1fr) !important;
+    gap: 6px !important;
+    padding: 6px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+    height: 58px !important;
+    min-height: 58px !important;
+    max-height: 58px !important;
+    grid-template-columns: 52px minmax(0, 1fr) 130px !important;
+    padding: 6px 10px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading .page-heading-logo {
+    width: 48px !important;
+    height: 36px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading h1 {
+    font-size: 20px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading p {
+    font-size: 8.5px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    padding: 4px 8px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters select,
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters input {
+    height: 24px !important;
+    min-height: 24px !important;
+    font-size: 10px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi {
+    padding: 8px 10px !important;
+    gap: 4px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi span {
+    font-size: 8.5px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+    font-size: 20px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi small {
+    font-size: 8.8px !important;
+  }
+
+  body[data-dashboard-screen="executive"] .dashboard-fullscreen-trigger:not(.is-active) {
+    top: 24px !important;
+    right: 315px !important;
+  }
+}
+
+/* =========================================================
+   STEP 3E - EXECUTIVE JS-FORCED PRESENTATION LAYOUT
+========================================================= */
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding: 7px !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-rows: 60px 46px minmax(0, 1fr) !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+  grid-row: 1 !important;
+  height: 60px !important;
+  min-height: 60px !important;
+  max-height: 60px !important;
+  margin: 0 !important;
+  padding: 6px 10px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters {
+  grid-row: 2 !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  margin: 0 !important;
+  padding: 4px 8px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi-list {
+  grid-row: 3 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi {
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 9px 11px !important;
+  justify-content: center !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+  font-size: 22px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi span {
+  font-size: 8.8px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi small {
+  font-size: 9px !important;
+}
+
+/* =========================================================
+   STEP 3F - EXECUTIVE FULLSCREEN OVERLAY BOARD
+   This forces Executive fullscreen into a true KPI board.
+========================================================= */
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] {
+  overflow: hidden !important;
+  background: #020a13 !important;
+}
+
+/* Main presentation canvas */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .main {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: #020a13 !important;
+}
+
+/* Keep page-stack as background only */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background: #020a13 !important;
+}
+
+/* Header fixed */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+  position: fixed !important;
+  top: 7px !important;
+  left: 7px !important;
+  right: 7px !important;
+  z-index: 9000 !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+  margin: 0 !important;
+  padding: 7px 12px !important;
+  border-radius: 13px !important;
+  display: grid !important;
+  grid-template-columns: 58px minmax(0, 1fr) 150px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  background:
+    radial-gradient(circle at top right, rgba(53, 246, 255, 0.12), transparent 36%),
+    linear-gradient(145deg, rgba(8, 28, 45, 0.98), rgba(2, 10, 20, 0.99)) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading .page-heading-logo {
+  width: 52px !important;
+  height: 38px !important;
+  min-width: 52px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading h1 {
+  font-size: 22px !important;
+  line-height: 0.95 !important;
+  margin: 0 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading p {
+  font-size: 9px !important;
+  line-height: 1 !important;
+  margin: 2px 0 0 !important;
+}
+
+/* Filters fixed */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters {
+  position: fixed !important;
+  top: 76px !important;
+  left: 7px !important;
+  right: 7px !important;
+  z-index: 9000 !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  margin: 0 !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  background:
+    linear-gradient(145deg, rgba(8, 28, 45, 0.98), rgba(2, 10, 20, 0.99)) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters label {
+  font-size: 9px !important;
+  line-height: 1 !important;
+  gap: 2px !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters select,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters input {
+  height: 25px !important;
+  min-height: 25px !important;
+  font-size: 10px !important;
+  border-radius: 8px !important;
+  padding: 2px 8px !important;
+}
+
+/* KPI board overlay: covers all old report content */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi-list {
+  position: fixed !important;
+  top: 129px !important;
+  left: 7px !important;
+  right: 7px !important;
+  bottom: 7px !important;
+  z-index: 9500 !important;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+  background: #020a13 !important;
+  box-sizing: border-box !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 9px 11px !important;
+  border-radius: 13px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at top right, rgba(53, 246, 255, 0.12), transparent 40%),
+    linear-gradient(145deg, rgba(7, 31, 52, 0.98), rgba(2, 10, 20, 0.99)) !important;
+  border: 1px solid rgba(69, 178, 220, 0.38) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 26px rgba(0,0,0,0.24) !important;
+  box-sizing: border-box !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi span {
+  font-size: 8.8px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.4px !important;
+  text-transform: uppercase !important;
+  color: rgba(190, 222, 255, 0.88) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+  font-size: 22px !important;
+  line-height: 0.95 !important;
+  color: #ffffff !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi small {
+  font-size: 9px !important;
+  line-height: 1.08 !important;
+  color: rgba(158, 207, 255, 0.86) !important;
+}
+
+/* Force old report elements underneath */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .analysis-heading,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-grid,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .grid.two,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .chart-panel,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .monthly-kpi-table {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Hide red floating helper in presentation if possible */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] button[style*="position: fixed"],
+body.dashboard-presentation-mode[data-dashboard-screen="master"] button[style*="position: fixed"],
+body.dashboard-presentation-mode[data-dashboard-screen="esg"] button[style*="position: fixed"] {
+  pointer-events: none !important;
+}
+
+/* Keep our fullscreen button clickable */
+body.dashboard-presentation-mode .dashboard-fullscreen-trigger {
+  pointer-events: auto !important;
+}
+
+/* EXIT button always above dashboard */
+body.dashboard-presentation-mode .dashboard-fullscreen-trigger.is-active {
+  z-index: 999999 !important;
+  top: 10px !important;
+  right: 12px !important;
+}
+
+/* Button normal position */
+body[data-dashboard-screen="executive"] .dashboard-fullscreen-trigger:not(.is-active) {
+  top: 25px !important;
+  right: 360px !important;
+}
+
+/* Snapped window tuning */
+@media (max-width: 1500px) {
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    top: 6px !important;
+    left: 6px !important;
+    right: 6px !important;
+    padding: 6px 10px !important;
+    grid-template-columns: 50px minmax(0, 1fr) 120px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading .page-heading-logo {
+    width: 46px !important;
+    height: 34px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading h1 {
+    font-size: 19px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading p {
+    font-size: 8px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters {
+    top: 68px !important;
+    left: 6px !important;
+    right: 6px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    padding: 3px 7px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters label {
+    font-size: 8px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters select,
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters input {
+    height: 22px !important;
+    min-height: 22px !important;
+    font-size: 9px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi-list {
+    top: 114px !important;
+    left: 6px !important;
+    right: 6px !important;
+    bottom: 6px !important;
+    gap: 6px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi {
+    padding: 8px 10px !important;
+    gap: 4px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi span {
+    font-size: 8px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+    font-size: 19px !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi small {
+    font-size: 8px !important;
+  }
+
+  body[data-dashboard-screen="executive"] .dashboard-fullscreen-trigger:not(.is-active) {
+    top: 23px !important;
+    right: 315px !important;
+  }
+}
+
+/* =========================================================
+   STEP 3G - EXECUTIVE CLEAN OVERLAY PRESENTATION BOARD
+========================================================= */
+
+.executive-presentation-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9800 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 7px !important;
+  display: grid !important;
+  grid-template-rows: 62px 46px minmax(0, 1fr) !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(53, 246, 255, 0.08), transparent 30%),
+    radial-gradient(circle at 85% 10%, rgba(255, 200, 61, 0.06), transparent 28%),
+    #020a13 !important;
+}
+
+.executive-presentation-header {
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+  display: grid !important;
+  grid-template-columns: 58px minmax(0, 1fr) 130px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 7px 12px !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  border: 1px solid rgba(69, 178, 220, 0.36) !important;
+  background:
+    radial-gradient(circle at top right, rgba(53, 246, 255, 0.14), transparent 36%),
+    linear-gradient(145deg, rgba(8, 28, 45, 0.98), rgba(2, 10, 20, 0.99)) !important;
+}
+
+.executive-presentation-logo {
+  width: 52px !important;
+  height: 38px !important;
+  border-radius: 8px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+}
+
+.executive-presentation-logo img {
+  max-width: 44px !important;
+  max-height: 30px !important;
+  object-fit: contain !important;
+}
+
+.executive-presentation-title span {
+  display: block !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.6px !important;
+  color: #35f6ff !important;
+}
+
+.executive-presentation-title strong {
+  display: block !important;
+  font-size: 23px !important;
+  line-height: 0.95 !important;
+  color: #ffffff !important;
+}
+
+.executive-presentation-title small {
+  display: block !important;
+  margin-top: 3px !important;
+  font-size: 9px !important;
+  color: rgba(155, 206, 255, 0.9) !important;
+}
+
+.executive-presentation-status {
+  justify-self: end !important;
+  width: 116px !important;
+  height: 42px !important;
+  border-radius: 10px !important;
+  padding: 6px 9px !important;
+  display: grid !important;
+  align-content: center !important;
+  border: 1px solid rgba(53, 246, 255, 0.34) !important;
+  background: rgba(4, 18, 31, 0.82) !important;
+}
+
+.executive-presentation-status span {
+  font-size: 8px !important;
+  color: #35f6ff !important;
+  font-weight: 900 !important;
+}
+
+.executive-presentation-status strong {
+  font-size: 14px !important;
+  color: #ffffff !important;
+}
+
+.executive-presentation-overlay .presentation-filter-strip {
+  position: static !important;
+  inset: auto !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  margin: 0 !important;
+  padding: 4px 8px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  align-items: center !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(69, 178, 220, 0.22) !important;
+  background: linear-gradient(145deg, rgba(8, 28, 45, 0.98), rgba(2, 10, 20, 0.99)) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.executive-presentation-overlay .presentation-filter-strip label {
+  font-size: 8px !important;
+  line-height: 1 !important;
+  gap: 2px !important;
+  color: rgba(215, 235, 255, 0.92) !important;
+}
+
+.executive-presentation-overlay .presentation-filter-strip input,
+.executive-presentation-overlay .presentation-filter-strip select {
+  height: 24px !important;
+  min-height: 24px !important;
+  font-size: 9px !important;
+  border-radius: 8px !important;
+  padding: 2px 8px !important;
+  color: #ffffff !important;
+  background: rgba(2, 10, 20, 0.95) !important;
+}
+
+.executive-presentation-overlay .presentation-kpi-board {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+}
+
+.executive-presentation-overlay .presentation-kpi-board .kpi {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 9px 11px !important;
+  border-radius: 13px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at top right, rgba(53, 246, 255, 0.13), transparent 40%),
+    linear-gradient(145deg, rgba(7, 31, 52, 0.98), rgba(2, 10, 20, 0.99)) !important;
+  border: 1px solid rgba(69, 178, 220, 0.38) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 26px rgba(0,0,0,0.24) !important;
+  box-sizing: border-box !important;
+}
+
+.executive-presentation-overlay .presentation-kpi-board .kpi span {
+  font-size: 8.8px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.4px !important;
+  text-transform: uppercase !important;
+  color: rgba(190, 222, 255, 0.88) !important;
+}
+
+.executive-presentation-overlay .presentation-kpi-board .kpi strong {
+  font-size: 22px !important;
+  line-height: 0.95 !important;
+  color: #ffffff !important;
+}
+
+.executive-presentation-overlay .presentation-kpi-board .kpi small {
+  font-size: 9px !important;
+  line-height: 1.08 !important;
+  color: rgba(158, 207, 255, 0.86) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .dashboard-fullscreen-trigger.is-active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 999999 !important;
+}
+
+@media (max-width: 1500px) {
+  .executive-presentation-overlay {
+    padding: 6px !important;
+    grid-template-rows: 56px 40px minmax(0, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .executive-presentation-header {
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    grid-template-columns: 50px minmax(0, 1fr) 112px !important;
+    padding: 6px 10px !important;
+  }
+
+  .executive-presentation-logo {
+    width: 46px !important;
+    height: 34px !important;
+  }
+
+  .executive-presentation-title strong {
+    font-size: 19px !important;
+  }
+
+  .executive-presentation-title span,
+  .executive-presentation-title small {
+    font-size: 8px !important;
+  }
+
+  .executive-presentation-status {
+    width: 104px !important;
+    height: 36px !important;
+    padding: 5px 8px !important;
+  }
+
+  .executive-presentation-overlay .presentation-filter-strip {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    padding: 3px 7px !important;
+  }
+
+  .executive-presentation-overlay .presentation-filter-strip label {
+    font-size: 7.5px !important;
+  }
+
+  .executive-presentation-overlay .presentation-filter-strip input,
+  .executive-presentation-overlay .presentation-filter-strip select {
+    height: 21px !important;
+    min-height: 21px !important;
+    font-size: 8.5px !important;
+  }
+
+  .executive-presentation-overlay .presentation-kpi-board {
+    gap: 6px !important;
+  }
+
+  .executive-presentation-overlay .presentation-kpi-board .kpi {
+    padding: 8px 10px !important;
+    gap: 4px !important;
+  }
+
+  .executive-presentation-overlay .presentation-kpi-board .kpi span {
+    font-size: 7.8px !important;
+  }
+
+  .executive-presentation-overlay .presentation-kpi-board .kpi strong {
+    font-size: 19px !important;
+  }
+
+  .executive-presentation-overlay .presentation-kpi-board .kpi small {
+    font-size: 8px !important;
+  }
+}
+
+/* =========================================================
+   STEP 4D - REMOVE EXECUTIVE FULLSCREEN HACK
+   Executive fullscreen now uses normal responsive page layout.
+========================================================= */
+
+.executive-presentation-overlay {
+  display: none !important;
+}
+
+/* Executive fullscreen should be a clean responsive app page, not forced overlay */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .app-shell {
+  grid-template-columns: 1fr !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .sidebar {
+  display: none !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .main {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding: clamp(8px, 1vw, 14px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  background: #020a13 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-rows: none !important;
+  gap: clamp(8px, 1vw, 14px) !important;
+  overflow: visible !important;
+}
+
+/* Restore all Executive content in fullscreen */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .page-stack > *,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .analysis-heading,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-context-grid,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .grid.two,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .chart-panel,
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .monthly-kpi-table {
+  display: revert !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Executive fullscreen responsive header */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+  position: static !important;
+  height: auto !important;
+  min-height: 72px !important;
+  max-height: none !important;
+  padding: clamp(10px, 1.2vw, 16px) !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading h1 {
+  font-size: clamp(1.45rem, 2.2vw, 2.2rem) !important;
+  line-height: 1.05 !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading p {
+  font-size: clamp(0.75rem, 0.8vw, 0.95rem) !important;
+}
+
+/* Executive fullscreen filters */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .filters {
+  position: static !important;
+  height: auto !important;
+  min-height: 60px !important;
+  max-height: none !important;
+  padding: clamp(9px, 1vw, 14px) !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)) !important;
+  gap: clamp(8px, 1vw, 12px) !important;
+}
+
+/* Executive fullscreen cards */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi-list {
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)) !important;
+  grid-template-rows: none !important;
+  gap: clamp(8px, 1vw, 14px) !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi {
+  min-height: clamp(94px, 11vh, 130px) !important;
+  height: auto !important;
+  padding: clamp(12px, 1.2vw, 18px) !important;
+  border-radius: clamp(12px, 1vw, 18px) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi span {
+  font-size: clamp(0.68rem, 0.65vw, 0.86rem) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi strong {
+  font-size: clamp(1.45rem, 2vw, 2.45rem) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi small {
+  font-size: clamp(0.72rem, 0.7vw, 0.95rem) !important;
+}
+
+/* Executive fullscreen charts/tables responsive */
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .grid.two {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)) !important;
+  gap: clamp(8px, 1vw, 14px) !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .chart-panel {
+  min-height: 280px !important;
+  overflow: hidden !important;
+}
+
+body.dashboard-presentation-mode[data-dashboard-screen="executive"] .monthly-kpi-table {
+  overflow-x: auto !important;
+}
+
+/* Keep EXIT button visible */
+body.dashboard-presentation-mode .dashboard-fullscreen-trigger.is-active {
+  position: fixed !important;
+  top: 10px !important;
+  right: 12px !important;
+  z-index: 999999 !important;
+}
+
+/* Small fullscreen window */
+@media (max-width: 760px) {
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading {
+    grid-template-columns: 54px minmax(0, 1fr) !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .company-dashboard-heading .userbox {
+    grid-column: 1 / -1 !important;
+    justify-self: stretch !important;
+  }
+
+  body.dashboard-presentation-mode[data-dashboard-screen="executive"] .kpi-list {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)) !important;
+  }
+}
