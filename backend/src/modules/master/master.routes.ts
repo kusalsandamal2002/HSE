@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { z } from "zod";
-import { prisma } from "../../lib/prisma";
-import { HttpError } from "../../utils/http";
-import { nullableId, nullableText } from "../../utils/schema";
-import { requireAuth } from "../../middleware/auth";
+import { prisma } from "../../lib/prisma.js";
+import { HttpError } from "../../utils/http.js";
+import { nullableId, nullableText } from "../../utils/schema.js";
+import { requireAuth } from "../../middleware/auth.js";
 
 export const masterRouter = Router();
 masterRouter.use(requireAuth);

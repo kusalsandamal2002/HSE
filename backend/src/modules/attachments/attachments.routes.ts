@@ -4,9 +4,9 @@ import fs from "fs";
 import path from "path";
 import { z } from "zod";
 import { AttachmentOwnerType } from "@prisma/client";
-import { env } from "../../config/env";
-import { prisma } from "../../lib/prisma";
-import { requireAuth } from "../../middleware/auth";
+import { env } from "../../config/env.js";
+import { prisma } from "../../lib/prisma.js";
+import { requireAuth } from "../../middleware/auth.js";
 
 export const attachmentsRouter = Router();
 attachmentsRouter.use(requireAuth);

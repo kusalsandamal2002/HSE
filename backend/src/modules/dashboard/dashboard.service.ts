@@ -1,6 +1,6 @@
 import { ObservationType, Prisma } from "@prisma/client";
-import { prisma } from "../../lib/prisma";
-import { monthRange } from "../../utils/http";
+import { prisma } from "../../lib/prisma.js";
+import { monthRange } from "../../utils/http.js";
 
 export type DashboardFilters = {
   year?: number;

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { requireAuth } from "../../middleware/auth";
-import { getDashboardSummary } from "./dashboard.service";
-import { toNumber, toStringValue } from "../../utils/http";
+import { requireAuth } from "../../middleware/auth.js";
+import { getDashboardSummary } from "./dashboard.service.js";
+import { toNumber, toStringValue } from "../../utils/http.js";
 
 export const dashboardRouter = Router();
 

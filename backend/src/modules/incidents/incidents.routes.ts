@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { Prisma, IncidentSeverity, RecordStatus } from "@prisma/client";
 import { z } from "zod";
-import { prisma } from "../../lib/prisma";
-import { requireAuth } from "../../middleware/auth";
-import { generateCode, monthRange, toNumber, toStringValue } from "../../utils/http";
-import { nullableId, nullableText } from "../../utils/schema";
+import { prisma } from "../../lib/prisma.js";
+import { requireAuth } from "../../middleware/auth.js";
+import { generateCode, monthRange, toNumber, toStringValue } from "../../utils/http.js";
+import { nullableId, nullableText } from "../../utils/schema.js";
 
 export const incidentsRouter = Router();
 incidentsRouter.use(requireAuth);

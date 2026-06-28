@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { Prisma } from "@prisma/client";
-import { requireAuth } from "../../middleware/auth";
-import { prisma } from "../../lib/prisma";
-import { getDashboardSummary } from "../dashboard/dashboard.service";
-import { monthRange, toNumber, toStringValue } from "../../utils/http";
+import { requireAuth } from "../../middleware/auth.js";
+import { prisma } from "../../lib/prisma.js";
+import { getDashboardSummary } from "../dashboard/dashboard.service.js";
+import { monthRange, toNumber, toStringValue } from "../../utils/http.js";
 
 export const reportsRouter = Router();
 reportsRouter.use(requireAuth);

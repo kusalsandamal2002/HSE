@@ -1,7 +1,7 @@
 ﻿import { Router } from "express";
-import { prisma } from "../../lib/prisma";
-import { requireAuth } from "../../middleware/auth";
-import { HttpError } from "../../utils/http";
+import { prisma } from "../../lib/prisma.js";
+import { requireAuth } from "../../middleware/auth.js";
+import { HttpError } from "../../utils/http.js";
 
 export const dataEntryRouter = Router();
 dataEntryRouter.use(requireAuth);

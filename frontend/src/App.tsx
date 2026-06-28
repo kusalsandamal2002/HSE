@@ -20,6 +20,7 @@ const EsgReportsPage = lazy(() => import("./pages/EsgModule").then((m) => ({ def
 const DataUploadCenterPage = lazy(() => import("./pages/DataUploadCenterPage").then((m) => ({ default: m.DataUploadCenterPage })));
 const DataEntryCenterPage = lazy(() => import("./pages/DataEntryCenterPage").then((m) => ({ default: m.DataEntryCenterPage })));
 const DataEntryTablePage = lazy(() => import("./pages/DataEntryTablePage").then((m) => ({ default: m.DataEntryTablePage })));
+const DataQualityCenterPage = lazy(() => import("./pages/DataQualityCenterPage").then((m) => ({ default: m.DataQualityCenterPage }))); 
 
 function PageLoading({ label = "Loading module..." }: { label?: string }) {
   return (
@@ -39,6 +40,7 @@ const mainDashboardPages = [
 const dataCenterPages = [
   { key: "data-entry", path: "/data-entry", label: "Data Entry Center" },
   { key: "data-upload", path: "/data-upload", label: "Data Upload Center" },
+  { key: "data-quality", path: "/data-quality", label: "Data Quality Center" },
 ] as const;
 
 const organizationPages = [
@@ -165,7 +167,7 @@ export function App() {
 
   function renderPage() {
     switch (page) {
-      case "dashboard": return <DashboardPage />;
+      case "dashboard": return <DashboardPage onNavigate={(next) => navigate(next)} />;
       case "master-dashboard": return <MasterDashboardPage />;
       case "esg-dashboard": return <EsgDashboardPage onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
 
@@ -175,6 +177,7 @@ export function App() {
           ? <DataEntryTablePage tableKey={tableKey} onNavigate={(next) => navigate(next)} />
           : <DataEntryCenterPage onNavigate={(next) => navigate(next)} />;
       }
+      case "data-quality": return <DataQualityCenterPage />;
       case "data-upload": return <DataUploadCenterPage scope="all" onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
 
       case "company": return <CompanyProfilePage />;
@@ -191,7 +194,7 @@ export function App() {
       case "esg-upload": return <DataUploadCenterPage scope="esg" onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
       case "esg-reports": return <EsgReportsPage onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
 
-      default: return <DashboardPage />;
+      default: return <DashboardPage onNavigate={(next) => navigate(next)} />;
     }
   }
 
@@ -266,4 +269,6 @@ export function App() {
     </div>
   );
 }
+
+
 

@@ -21,19 +21,58 @@ const colors = {
   action: "#475569",
 };
 const pieColors = [colors.firstAid, colors.medical, colors.reportable, colors.lostHours, colors.nearMiss, colors.unsafe, colors.afr];
+const dataRoutes = {
+  incidents: "/incidents",
+  medical: "/medical-expenses",
+  actions: "/corrective-actions",
+  observations: "/observations",
+  hours: "/working-hours",
+  master: "/master-data",
+  upload: "/data-upload",
+  reports: "/reports",
+  company: "/company-profile",
+  dataEntry: "/data-entry",
+} as const;
 
-function ChartPanel({ title, subtitle, children, empty }: { title: string; subtitle?: string; children: ReactNode; empty: boolean }) {
+function ChartPanel({
+  title,
+  subtitle,
+  children,
+  empty,
+  onDrillDown,
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  empty: boolean;
+  onDrillDown?: () => void;
+}) {
   return (
-    <div className="panel chart-panel">
+    <div
+      className={`panel chart-panel${onDrillDown ? " drillable-chart" : ""}`}
+      onDoubleClick={onDrillDown ? () => onDrillDown() : undefined}
+      onKeyDown={(event) => {
+        if (!onDrillDown) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onDrillDown();
+        }
+      }}
+      role={onDrillDown ? "button" : undefined}
+      tabIndex={onDrillDown ? 0 : undefined}
+      title={onDrillDown ? `${title} - double click to open source data` : title}
+    >
       <div className="chart-title">
         <h2>{title}</h2>
-        {subtitle && <span>{subtitle}</span>}
+        <div className="chart-title-meta">
+          {subtitle && <span>{subtitle}</span>}
+          {onDrillDown && <small>Double-click to open source data</small>}
+        </div>
       </div>
       {empty ? <EmptyState text="No chart data" detail="Try another period or department." /> : children}
     </div>
   );
 }
-
 function SectionHeader({ title, detail }: { title: string; detail: string }) {
   return <div className="analysis-heading"><h2>{title}</h2><p>{detail}</p></div>;
 }
@@ -57,7 +96,9 @@ function mixedTooltip(value: number, name: string) {
   return formatNumber(value);
 }
 
-export function DashboardPage() {
+type DashboardPageProps = { onNavigate?: (path: string) => void };
+
+export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
   const [year, setYear] = useState(2026);
   const [month, setMonth] = useState("");
   const [departmentId, setDepartmentId] = useState("");
@@ -65,6 +106,17 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { lookups } = useLookups();
+
+  function drillTo(path: string) {
+    if (onNavigate) {
+      onNavigate(path);
+      return;
+    }
+    window.history.pushState({}, "", path);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  }
+
+  const drill = (path: string) => () => drillTo(path);
 
   useEffect(() => {
     const params = new URLSearchParams({ year: String(year) });
@@ -92,6 +144,34 @@ export function DashboardPage() {
     { label: "Pending Actions", value: formatNumber(k.pendingActions), hint: "Pending and in-progress" },
     { label: "Overdue Actions", value: formatNumber(k.overdueActions), hint: "Past due date" },
     { label: "Working Hours", value: formatNumber(k.totalWorkingHours), hint: "Company total unless department filtered" },
+  ];
+
+  const kpiDrillPathByLabel: Record<string, string> = {
+    "Total Accidents": dataRoutes.incidents,
+    "First Aid": dataRoutes.incidents,
+    "Medical": dataRoutes.incidents,
+    "Reportable": dataRoutes.incidents,
+    "Lost Time Incidents": dataRoutes.incidents,
+    "Lost Hours": dataRoutes.incidents,
+    "Medical Expenses": dataRoutes.medical,
+    "AFR": dataRoutes.hours,
+    "Near Miss / Unsafe": dataRoutes.observations,
+    "Pending Actions": dataRoutes.actions,
+    "Overdue Actions": dataRoutes.actions,
+    "Working Hours": dataRoutes.hours,
+  };
+
+  const moduleDrilldowns = [
+    { label: "Accident Register", value: formatNumber(k.totalIncidents), hint: "Accident, injury, root cause, severity and lost-time records", path: dataRoutes.incidents, bars: [Number(k.firstAid || 0), Number(k.medicalTreatment || 0), Number(k.reportable || 0)] },
+    { label: "Medical Expenses", value: formatCurrency(k.medicalExpenseTotal), hint: "Medical cost records linked to incidents and monthly summaries", path: dataRoutes.medical, bars: [Number(k.medicalExpenseTotal || 0), Number(k.medicalTreatment || 0), 1] },
+    { label: "Corrective Actions", value: formatNumber(k.pendingActions), hint: "Pending, in-progress, completed and overdue action tracking", path: dataRoutes.actions, bars: [Number(k.pendingActions || 0), Number(k.overdueActions || 0), 1] },
+    { label: "Near Miss / Unsafe", value: formatNumber(k.observations), hint: "Near miss, unsafe act, unsafe condition and risk observations", path: dataRoutes.observations, bars: [Number(k.observations || 0), Number(k.pendingActions || 0), 1] },
+    { label: "Working Hours", value: formatNumber(k.totalWorkingHours), hint: "Department man-hours, overtime, AFR source data and exposure hours", path: dataRoutes.hours, bars: [Number(k.totalWorkingHours || 0), Number(k.afr || 0), 1] },
+    { label: "Master Data", value: "Open", hint: "Departments, employees, machines, shifts and lookup master records", path: dataRoutes.master, bars: [80, 58, 36] },
+    { label: "Data Entry Center", value: "Open", hint: "Excel-like central entry interface for all editable HSE records", path: dataRoutes.dataEntry, bars: [85, 60, 42] },
+    { label: "Data Upload Center", value: "Open", hint: "Bulk workbook upload, validation, approval and import workflow", path: dataRoutes.upload, bars: [65, 45, 25] },
+    { label: "Reports & Downloads", value: "Open", hint: "Monthly reports, yearly reports, CSV exports and JSON backups", path: dataRoutes.reports, bars: [75, 50, 30] },
+    { label: "Company Profile", value: "Open", hint: "Company identity, HSE/ESG profile and reporting context", path: dataRoutes.company, bars: [70, 48, 28] },
   ];
 
   const chartData = data?.charts || {};
@@ -162,7 +242,7 @@ export function DashboardPage() {
 
       <SectionHeader title="Main Dashboard Trends" detail="Accident movement and medical cost by month." />
       <div className="grid two">
-        <ChartPanel title="Monthly Accident Trend" subtitle="First aid, medical, reportable and total" empty={!hasAny(monthlyTrend, ["incidents", "firstAid", "medicalTreatment", "reportable"])}>
+        <ChartPanel title="Monthly Accident Trend" onDrillDown={drill(dataRoutes.incidents)} subtitle="First aid, medical, reportable and total" empty={!hasAny(monthlyTrend, ["incidents", "firstAid", "medicalTreatment", "reportable"])}>
           <ResponsiveContainer width="100%" height={310}>
             <ComposedChart data={monthlyTrend} margin={{ top: 10, right: 18, left: 0, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -178,7 +258,7 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Monthly Medical Expense Trend" subtitle="LKR by month" empty={!hasAny(medicalExpenseTrend, ["medicalExpense"])}>
+        <ChartPanel title="Monthly Medical Expense Trend" onDrillDown={drill(dataRoutes.medical)} subtitle="LKR by month" empty={!hasAny(medicalExpenseTrend, ["medicalExpense"])}>
           <ResponsiveContainer width="100%" height={310}>
             <BarChart data={medicalExpenseTrend} margin={{ top: 10, right: 18, left: 0, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -193,7 +273,7 @@ export function DashboardPage() {
 
       <SectionHeader title="Department And Cause Analysis" detail="Department-level safety performance, lost hours, root causes and medical cost." />
       <div className="grid two">
-        <ChartPanel title="Department-wise Accident Summary" subtitle="Accident types and lost hours" empty={!hasAny(departmentAccidentSummary, ["count", "firstAid", "medicalTreatment", "reportable", "lostHours"])}>
+        <ChartPanel title="Department-wise Accident Summary" onDrillDown={drill(dataRoutes.incidents)} subtitle="Accident types and lost hours" empty={!hasAny(departmentAccidentSummary, ["count", "firstAid", "medicalTreatment", "reportable", "lostHours"])}>
           <ResponsiveContainer width="100%" height={330}>
             <ComposedChart data={departmentAccidentSummary} margin={{ top: 10, right: 18, left: 0, bottom: 58 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -210,7 +290,7 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Department-wise Lost Hours" subtitle="Departments ranked by lost time" empty={!hasAny(departmentLostHours, ["lostHours"])}>
+        <ChartPanel title="Department-wise Lost Hours" onDrillDown={drill(dataRoutes.incidents)} subtitle="Departments ranked by lost time" empty={!hasAny(departmentLostHours, ["lostHours"])}>
           <ResponsiveContainer width="100%" height={330}>
             <BarChart data={departmentLostHours} layout="vertical" margin={{ top: 10, right: 18, left: 118, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -222,7 +302,7 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Root Cause Analysis" subtitle="Grouped by root cause" empty={!hasAny(rootCauseSummary)}>
+        <ChartPanel title="Root Cause Analysis" onDrillDown={drill(dataRoutes.incidents)} subtitle="Grouped by root cause" empty={!hasAny(rootCauseSummary)}>
           <ResponsiveContainer width="100%" height={330}>
             <BarChart data={rootCauseSummary} layout="vertical" margin={{ top: 10, right: 18, left: 148, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -234,7 +314,7 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Department-wise Medical Expense" subtitle="LKR by department" empty={!hasAny(medicalExpenseByDepartment, ["medicalExpense"])}>
+        <ChartPanel title="Department-wise Medical Expense" onDrillDown={drill(dataRoutes.medical)} subtitle="LKR by department" empty={!hasAny(medicalExpenseByDepartment, ["medicalExpense"])}>
           <ResponsiveContainer width="100%" height={330}>
             <BarChart data={medicalExpenseByDepartment} layout="vertical" margin={{ top: 10, right: 18, left: 118, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -249,7 +329,7 @@ export function DashboardPage() {
 
       <SectionHeader title="Actions And Observation Analysis" detail="Accident types, injury types, corrective action status and near miss / unsafe trends." />
       <div className="grid two">
-        <ChartPanel title="Accident Type Breakdown" subtitle="First aid, medical, reportable and lost time" empty={!hasAny(accidentTypeBreakdown)}>
+        <ChartPanel title="Accident Type Breakdown" onDrillDown={drill(dataRoutes.incidents)} subtitle="First aid, medical, reportable and lost time" empty={!hasAny(accidentTypeBreakdown)}>
           <ResponsiveContainer width="100%" height={310}>
             <PieChart>
               <Tooltip formatter={(value: number) => formatNumber(value)} />
@@ -261,7 +341,7 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Injury Type Breakdown" subtitle="Grouped by injury type" empty={!hasAny(injuryTypeBreakdown)}>
+        <ChartPanel title="Injury Type Breakdown" onDrillDown={drill(dataRoutes.incidents)} subtitle="Grouped by injury type" empty={!hasAny(injuryTypeBreakdown)}>
           <ResponsiveContainer width="100%" height={310}>
             <BarChart data={injuryTypeBreakdown} layout="vertical" margin={{ top: 10, right: 18, left: 118, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -273,7 +353,7 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Corrective Action Status" subtitle="Pending, in progress, completed and overdue" empty={!hasAny(correctiveActionStatus)}>
+        <ChartPanel title="Corrective Action Status" onDrillDown={drill(dataRoutes.actions)} subtitle="Pending, in progress, completed and overdue" empty={!hasAny(correctiveActionStatus)}>
           <ResponsiveContainer width="100%" height={310}>
             <BarChart data={correctiveActionStatus} margin={{ top: 10, right: 18, left: 0, bottom: 30 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -317,7 +397,7 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Near Miss / Unsafe Closure Trend" subtitle="Completed and pending observation actions" empty={!hasAny(nearMissUnsafeClosureTrend, ["completed", "pending", "total"])}>
+        <ChartPanel title="Near Miss / Unsafe Closure Trend" onDrillDown={drill(dataRoutes.observations)} subtitle="Completed and pending observation actions" empty={!hasAny(nearMissUnsafeClosureTrend, ["completed", "pending", "total"])}>
           <ResponsiveContainer width="100%" height={310}>
             <ComposedChart data={nearMissUnsafeClosureTrend} margin={{ top: 10, right: 18, left: 0, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -347,7 +427,7 @@ export function DashboardPage() {
 
       <SectionHeader title="Working Hours And AFR" detail="Exposure hours, lost hours and accident frequency trend." />
       <div className="grid two">
-        <ChartPanel title="Working Hours Trend" subtitle="Monthly exposure hours" empty={!hasAny(workingHoursTrend, ["workingHours"])}>
+        <ChartPanel title="Working Hours Trend" onDrillDown={drill(dataRoutes.hours)} subtitle="Monthly exposure hours" empty={!hasAny(workingHoursTrend, ["workingHours"])}>
           <ResponsiveContainer width="100%" height={310}>
             <BarChart data={workingHoursTrend} margin={{ top: 10, right: 18, left: 0, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -359,7 +439,7 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="AFR Trend" subtitle="Accident frequency rate by month" empty={!hasAny(afrTrend, ["afr"])}>
+        <ChartPanel title="AFR Trend" onDrillDown={drill(dataRoutes.hours)} subtitle="Accident frequency rate by month" empty={!hasAny(afrTrend, ["afr"])}>
           <ResponsiveContainer width="100%" height={310}>
             <LineChart data={afrTrend} margin={{ top: 10, right: 18, left: 0, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -371,7 +451,7 @@ export function DashboardPage() {
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Lost Hours Trend" subtitle="Lost hours and lost-time incidents" empty={!hasAny(lostHoursTrend, ["lostHours", "lostTimeIncidents"])}>
+        <ChartPanel title="Lost Hours Trend" onDrillDown={drill(dataRoutes.incidents)} subtitle="Lost hours and lost-time incidents" empty={!hasAny(lostHoursTrend, ["lostHours", "lostTimeIncidents"])}>
           <ResponsiveContainer width="100%" height={310}>
             <ComposedChart data={lostHoursTrend} margin={{ top: 10, right: 18, left: 0, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5edf1" />
@@ -399,4 +479,6 @@ export function DashboardPage() {
     </section>
   );
 }
+
+
 
