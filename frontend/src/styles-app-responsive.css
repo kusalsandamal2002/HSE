@@ -870,3 +870,1713 @@ body.dashboard-presentation-mode .main {
     border-radius: 12px !important;
   }
 }
+
+/* =========================================================
+   STEP 5A - DATA ENTRY / UPLOAD / COMPANY PROFILE / REPORTS
+   PROFESSIONAL RESPONSIVE POLISH
+   Goal:
+   - Forms, cards, tables, tabs and action bars reflow cleanly
+   - No card cutting
+   - Tables scroll horizontally only when needed
+   - Whole app stays usable in split-window and small screens
+========================================================= */
+
+
+/* =========================================================
+   1. DATA ENTRY CENTER
+========================================================= */
+
+.data-entry-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.data-entry-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 360px) !important;
+  gap: clamp(10px, 1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.data-entry-hero h1 {
+  font-size: clamp(1.45rem, 2.2vw, 2.5rem) !important;
+  line-height: 1.05 !important;
+}
+
+.data-entry-hero p {
+  max-width: 100% !important;
+}
+
+.data-entry-search {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.data-entry-search input,
+.data-entry-search select,
+.data-entry-search button {
+  max-width: 100% !important;
+}
+
+.data-entry-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.data-entry-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: stretch !important;
+}
+
+.data-entry-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: clamp(118px, 12vh, 160px) !important;
+  padding: clamp(12px, 1.2vw, 18px) !important;
+  overflow: hidden !important;
+  overflow-wrap: anywhere !important;
+}
+
+.data-entry-card h3,
+.data-entry-card strong {
+  font-size: clamp(0.95rem, 0.9vw, 1.15rem) !important;
+  line-height: 1.15 !important;
+}
+
+.data-entry-card p,
+.data-entry-card span,
+.data-entry-card small {
+  font-size: clamp(0.72rem, 0.72vw, 0.92rem) !important;
+  line-height: 1.35 !important;
+}
+
+
+/* =========================================================
+   2. DATA ENTRY TABLE PAGE
+========================================================= */
+
+.data-entry-table-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: end !important;
+}
+
+.data-entry-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+.data-entry-actions button,
+.ghost-btn,
+.danger-btn {
+  max-width: 100% !important;
+  white-space: nowrap !important;
+}
+
+.data-entry-grid-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  border-radius: clamp(12px, 1vw, 18px) !important;
+}
+
+.data-entry-grid {
+  width: 100% !important;
+  min-width: 980px !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.data-entry-grid th,
+.data-entry-grid td {
+  min-width: 120px !important;
+  max-width: 240px !important;
+  overflow-wrap: anywhere !important;
+  vertical-align: top !important;
+}
+
+.data-entry-grid input,
+.data-entry-grid select,
+.data-entry-grid textarea {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.sticky-action {
+  position: sticky !important;
+  right: 0 !important;
+  z-index: 5 !important;
+  min-width: 132px !important;
+  max-width: 150px !important;
+}
+
+.action-cell {
+  display: table-cell !important;
+}
+
+.empty-cell {
+  text-align: center !important;
+}
+
+.data-entry-help {
+  font-size: clamp(0.72rem, 0.7vw, 0.9rem) !important;
+  line-height: 1.35 !important;
+}
+
+
+/* =========================================================
+   3. DATA UPLOAD CENTER
+========================================================= */
+
+.data-upload-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.data-upload-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.data-upload-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.data-upload-brand {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+.data-upload-brand h1 {
+  font-size: clamp(1.35rem, 2vw, 2.25rem) !important;
+  line-height: 1.05 !important;
+}
+
+.data-upload-actions {
+  min-width: 0 !important;
+}
+
+.data-upload-action-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+.data-upload-grid,
+.data-upload-grid-wide {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: start !important;
+}
+
+.data-upload-dropzone,
+.data-upload-preview,
+.data-upload-history {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.data-upload-drop-area {
+  min-height: clamp(160px, 22vh, 260px) !important;
+  padding: clamp(14px, 1.5vw, 24px) !important;
+}
+
+.data-upload-drop-actions,
+.data-upload-actions-block {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.data-upload-file-chip,
+.data-upload-result-card,
+.data-upload-alert,
+.data-upload-detection,
+.data-upload-preview-panel {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+}
+
+.data-upload-detection-grid,
+.data-upload-stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)) !important;
+  gap: 8px !important;
+}
+
+.data-upload-tags {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+.data-upload-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+}
+
+.data-upload-table-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  border-radius: 12px !important;
+}
+
+.data-upload-table {
+  width: 100% !important;
+  min-width: 760px !important;
+}
+
+.data-upload-table th,
+.data-upload-table td {
+  overflow-wrap: anywhere !important;
+}
+
+.data-upload-issues {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+
+/* =========================================================
+   4. COMPANY PROFILE PAGE
+========================================================= */
+
+.company-profile-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.cp-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.cp-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px) !important;
+  gap: clamp(12px, 1.2vw, 20px) !important;
+  align-items: center !important;
+}
+
+.cp-hero-brand {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+.cp-hero-copy h1 {
+  font-size: clamp(1.55rem, 2.4vw, 2.75rem) !important;
+  line-height: 1.03 !important;
+}
+
+.cp-hero-copy p {
+  font-size: clamp(0.78rem, 0.8vw, 1rem) !important;
+  line-height: 1.35 !important;
+}
+
+.cp-hero-side {
+  min-width: 0 !important;
+}
+
+.cp-mini-stats {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)) !important;
+  gap: 8px !important;
+}
+
+.cp-section,
+.cp-section-overview {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.cp-section-heading {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+.cp-identity-grid,
+.cp-split-grid,
+.cp-values-grid,
+.cp-module-grid {
+  display: grid !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+}
+
+.cp-identity-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)) !important;
+}
+
+.cp-split-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)) !important;
+}
+
+.cp-values-grid,
+.cp-module-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)) !important;
+}
+
+.cp-identity-card,
+.cp-value-card,
+.cp-module-card,
+.cp-note-card,
+.cp-overview-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.cp-chip-list,
+.cp-inline-summary {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+
+/* =========================================================
+   5. REPORTS & DOWNLOADS PAGE
+========================================================= */
+
+.reports-download-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.rd-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.report-brand-title {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+.report-brand-title h1 {
+  font-size: clamp(1.45rem, 2.2vw, 2.5rem) !important;
+  line-height: 1.05 !important;
+}
+
+.rd-hero-meta {
+  min-width: 0 !important;
+}
+
+.rd-filters {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.rd-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.7fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: start !important;
+}
+
+.rd-card,
+.rd-main-card,
+.rd-danger-card,
+.rd-note {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.rd-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)) !important;
+}
+
+.rd-button-stack {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+.rd-download-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+}
+
+.rd-download-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: 92px !important;
+  overflow-wrap: anywhere !important;
+  text-align: left !important;
+}
+
+.reports-download-page .chart-title {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  justify-content: space-between !important;
+}
+
+.reports-download-page .panel:has(table),
+.reports-download-page table {
+  max-width: 100% !important;
+}
+
+
+/* =========================================================
+   6. SHARED SMALL-WINDOW POLISH
+========================================================= */
+
+@media (max-width: 1100px) {
+  .data-entry-hero,
+  .data-upload-hero,
+  .cp-hero,
+  .rd-hero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .data-upload-action-row,
+  .data-entry-actions {
+    justify-content: flex-start !important;
+  }
+
+  .rd-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .data-entry-table-header {
+    grid-template-columns: 1fr !important;
+    align-items: start !important;
+  }
+
+  .data-entry-actions {
+    justify-content: flex-start !important;
+  }
+
+  .data-entry-card-grid,
+  .data-upload-grid,
+  .data-upload-grid-wide,
+  .cp-identity-grid,
+  .cp-split-grid,
+  .cp-values-grid,
+  .cp-module-grid,
+  .rd-download-grid,
+  .rd-kpis {
+    grid-template-columns: 1fr !important;
+  }
+
+  .data-entry-grid {
+    min-width: 860px !important;
+  }
+
+  .data-upload-table {
+    min-width: 680px !important;
+  }
+
+  .data-entry-card,
+  .data-upload-card,
+  .cp-card,
+  .rd-card {
+    padding: 10px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .data-entry-grid {
+    min-width: 760px !important;
+  }
+
+  .data-upload-table {
+    min-width: 620px !important;
+  }
+
+  .sticky-action {
+    min-width: 110px !important;
+  }
+
+  .data-entry-hero h1,
+  .data-upload-brand h1,
+  .cp-hero-copy h1,
+  .report-brand-title h1 {
+    font-size: 1.35rem !important;
+  }
+}
+
+/* =========================================================
+   STEP 5A - DATA ENTRY / UPLOAD / COMPANY PROFILE / REPORTS
+   PROFESSIONAL RESPONSIVE POLISH
+   Goal:
+   - Forms, cards, tables, tabs and action bars reflow cleanly
+   - No card cutting
+   - Tables scroll horizontally only when needed
+   - Whole app stays usable in split-window and small screens
+========================================================= */
+
+
+/* =========================================================
+   1. DATA ENTRY CENTER
+========================================================= */
+
+.data-entry-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.data-entry-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 360px) !important;
+  gap: clamp(10px, 1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.data-entry-hero h1 {
+  font-size: clamp(1.45rem, 2.2vw, 2.5rem) !important;
+  line-height: 1.05 !important;
+}
+
+.data-entry-hero p {
+  max-width: 100% !important;
+}
+
+.data-entry-search {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.data-entry-search input,
+.data-entry-search select,
+.data-entry-search button {
+  max-width: 100% !important;
+}
+
+.data-entry-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.data-entry-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: stretch !important;
+}
+
+.data-entry-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: clamp(118px, 12vh, 160px) !important;
+  padding: clamp(12px, 1.2vw, 18px) !important;
+  overflow: hidden !important;
+  overflow-wrap: anywhere !important;
+}
+
+.data-entry-card h3,
+.data-entry-card strong {
+  font-size: clamp(0.95rem, 0.9vw, 1.15rem) !important;
+  line-height: 1.15 !important;
+}
+
+.data-entry-card p,
+.data-entry-card span,
+.data-entry-card small {
+  font-size: clamp(0.72rem, 0.72vw, 0.92rem) !important;
+  line-height: 1.35 !important;
+}
+
+
+/* =========================================================
+   2. DATA ENTRY TABLE PAGE
+========================================================= */
+
+.data-entry-table-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: end !important;
+}
+
+.data-entry-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+.data-entry-actions button,
+.ghost-btn,
+.danger-btn {
+  max-width: 100% !important;
+  white-space: nowrap !important;
+}
+
+.data-entry-grid-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  border-radius: clamp(12px, 1vw, 18px) !important;
+}
+
+.data-entry-grid {
+  width: 100% !important;
+  min-width: 980px !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.data-entry-grid th,
+.data-entry-grid td {
+  min-width: 120px !important;
+  max-width: 240px !important;
+  overflow-wrap: anywhere !important;
+  vertical-align: top !important;
+}
+
+.data-entry-grid input,
+.data-entry-grid select,
+.data-entry-grid textarea {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.sticky-action {
+  position: sticky !important;
+  right: 0 !important;
+  z-index: 5 !important;
+  min-width: 132px !important;
+  max-width: 150px !important;
+}
+
+.action-cell {
+  display: table-cell !important;
+}
+
+.empty-cell {
+  text-align: center !important;
+}
+
+.data-entry-help {
+  font-size: clamp(0.72rem, 0.7vw, 0.9rem) !important;
+  line-height: 1.35 !important;
+}
+
+
+/* =========================================================
+   3. DATA UPLOAD CENTER
+========================================================= */
+
+.data-upload-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.data-upload-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.data-upload-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.data-upload-brand {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+.data-upload-brand h1 {
+  font-size: clamp(1.35rem, 2vw, 2.25rem) !important;
+  line-height: 1.05 !important;
+}
+
+.data-upload-actions {
+  min-width: 0 !important;
+}
+
+.data-upload-action-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+.data-upload-grid,
+.data-upload-grid-wide {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: start !important;
+}
+
+.data-upload-dropzone,
+.data-upload-preview,
+.data-upload-history {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.data-upload-drop-area {
+  min-height: clamp(160px, 22vh, 260px) !important;
+  padding: clamp(14px, 1.5vw, 24px) !important;
+}
+
+.data-upload-drop-actions,
+.data-upload-actions-block {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.data-upload-file-chip,
+.data-upload-result-card,
+.data-upload-alert,
+.data-upload-detection,
+.data-upload-preview-panel {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+}
+
+.data-upload-detection-grid,
+.data-upload-stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)) !important;
+  gap: 8px !important;
+}
+
+.data-upload-tags {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+.data-upload-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+}
+
+.data-upload-table-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  border-radius: 12px !important;
+}
+
+.data-upload-table {
+  width: 100% !important;
+  min-width: 760px !important;
+}
+
+.data-upload-table th,
+.data-upload-table td {
+  overflow-wrap: anywhere !important;
+}
+
+.data-upload-issues {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+
+/* =========================================================
+   4. COMPANY PROFILE PAGE
+========================================================= */
+
+.company-profile-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.cp-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.cp-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px) !important;
+  gap: clamp(12px, 1.2vw, 20px) !important;
+  align-items: center !important;
+}
+
+.cp-hero-brand {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+.cp-hero-copy h1 {
+  font-size: clamp(1.55rem, 2.4vw, 2.75rem) !important;
+  line-height: 1.03 !important;
+}
+
+.cp-hero-copy p {
+  font-size: clamp(0.78rem, 0.8vw, 1rem) !important;
+  line-height: 1.35 !important;
+}
+
+.cp-hero-side {
+  min-width: 0 !important;
+}
+
+.cp-mini-stats {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)) !important;
+  gap: 8px !important;
+}
+
+.cp-section,
+.cp-section-overview {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.cp-section-heading {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+.cp-identity-grid,
+.cp-split-grid,
+.cp-values-grid,
+.cp-module-grid {
+  display: grid !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+}
+
+.cp-identity-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)) !important;
+}
+
+.cp-split-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)) !important;
+}
+
+.cp-values-grid,
+.cp-module-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)) !important;
+}
+
+.cp-identity-card,
+.cp-value-card,
+.cp-module-card,
+.cp-note-card,
+.cp-overview-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.cp-chip-list,
+.cp-inline-summary {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+
+/* =========================================================
+   5. REPORTS & DOWNLOADS PAGE
+========================================================= */
+
+.reports-download-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.rd-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.report-brand-title {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+.report-brand-title h1 {
+  font-size: clamp(1.45rem, 2.2vw, 2.5rem) !important;
+  line-height: 1.05 !important;
+}
+
+.rd-hero-meta {
+  min-width: 0 !important;
+}
+
+.rd-filters {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.rd-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.7fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: start !important;
+}
+
+.rd-card,
+.rd-main-card,
+.rd-danger-card,
+.rd-note {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.rd-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)) !important;
+}
+
+.rd-button-stack {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+.rd-download-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+}
+
+.rd-download-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: 92px !important;
+  overflow-wrap: anywhere !important;
+  text-align: left !important;
+}
+
+.reports-download-page .chart-title {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  justify-content: space-between !important;
+}
+
+.reports-download-page .panel:has(table),
+.reports-download-page table {
+  max-width: 100% !important;
+}
+
+
+/* =========================================================
+   6. SHARED SMALL-WINDOW POLISH
+========================================================= */
+
+@media (max-width: 1100px) {
+  .data-entry-hero,
+  .data-upload-hero,
+  .cp-hero,
+  .rd-hero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .data-upload-action-row,
+  .data-entry-actions {
+    justify-content: flex-start !important;
+  }
+
+  .rd-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .data-entry-table-header {
+    grid-template-columns: 1fr !important;
+    align-items: start !important;
+  }
+
+  .data-entry-actions {
+    justify-content: flex-start !important;
+  }
+
+  .data-entry-card-grid,
+  .data-upload-grid,
+  .data-upload-grid-wide,
+  .cp-identity-grid,
+  .cp-split-grid,
+  .cp-values-grid,
+  .cp-module-grid,
+  .rd-download-grid,
+  .rd-kpis {
+    grid-template-columns: 1fr !important;
+  }
+
+  .data-entry-grid {
+    min-width: 860px !important;
+  }
+
+  .data-upload-table {
+    min-width: 680px !important;
+  }
+
+  .data-entry-card,
+  .data-upload-card,
+  .cp-card,
+  .rd-card {
+    padding: 10px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .data-entry-grid {
+    min-width: 760px !important;
+  }
+
+  .data-upload-table {
+    min-width: 620px !important;
+  }
+
+  .sticky-action {
+    min-width: 110px !important;
+  }
+
+  .data-entry-hero h1,
+  .data-upload-brand h1,
+  .cp-hero-copy h1,
+  .report-brand-title h1 {
+    font-size: 1.35rem !important;
+  }
+}
+
+/* =========================================================
+   STEP 5A - DATA ENTRY / UPLOAD / COMPANY PROFILE / REPORTS
+   PROFESSIONAL RESPONSIVE POLISH
+   Goal:
+   - Forms, cards, tables, tabs and action bars reflow cleanly
+   - No card cutting
+   - Tables scroll horizontally only when needed
+   - Whole app stays usable in split-window and small screens
+========================================================= */
+
+
+/* =========================================================
+   1. DATA ENTRY CENTER
+========================================================= */
+
+.data-entry-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.data-entry-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 360px) !important;
+  gap: clamp(10px, 1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.data-entry-hero h1 {
+  font-size: clamp(1.45rem, 2.2vw, 2.5rem) !important;
+  line-height: 1.05 !important;
+}
+
+.data-entry-hero p {
+  max-width: 100% !important;
+}
+
+.data-entry-search {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.data-entry-search input,
+.data-entry-search select,
+.data-entry-search button {
+  max-width: 100% !important;
+}
+
+.data-entry-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.data-entry-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: stretch !important;
+}
+
+.data-entry-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: clamp(118px, 12vh, 160px) !important;
+  padding: clamp(12px, 1.2vw, 18px) !important;
+  overflow: hidden !important;
+  overflow-wrap: anywhere !important;
+}
+
+.data-entry-card h3,
+.data-entry-card strong {
+  font-size: clamp(0.95rem, 0.9vw, 1.15rem) !important;
+  line-height: 1.15 !important;
+}
+
+.data-entry-card p,
+.data-entry-card span,
+.data-entry-card small {
+  font-size: clamp(0.72rem, 0.72vw, 0.92rem) !important;
+  line-height: 1.35 !important;
+}
+
+
+/* =========================================================
+   2. DATA ENTRY TABLE PAGE
+========================================================= */
+
+.data-entry-table-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: end !important;
+}
+
+.data-entry-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+.data-entry-actions button,
+.ghost-btn,
+.danger-btn {
+  max-width: 100% !important;
+  white-space: nowrap !important;
+}
+
+.data-entry-grid-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  border-radius: clamp(12px, 1vw, 18px) !important;
+}
+
+.data-entry-grid {
+  width: 100% !important;
+  min-width: 980px !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.data-entry-grid th,
+.data-entry-grid td {
+  min-width: 120px !important;
+  max-width: 240px !important;
+  overflow-wrap: anywhere !important;
+  vertical-align: top !important;
+}
+
+.data-entry-grid input,
+.data-entry-grid select,
+.data-entry-grid textarea {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.sticky-action {
+  position: sticky !important;
+  right: 0 !important;
+  z-index: 5 !important;
+  min-width: 132px !important;
+  max-width: 150px !important;
+}
+
+.action-cell {
+  display: table-cell !important;
+}
+
+.empty-cell {
+  text-align: center !important;
+}
+
+.data-entry-help {
+  font-size: clamp(0.72rem, 0.7vw, 0.9rem) !important;
+  line-height: 1.35 !important;
+}
+
+
+/* =========================================================
+   3. DATA UPLOAD CENTER
+========================================================= */
+
+.data-upload-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.data-upload-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.data-upload-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.data-upload-brand {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+.data-upload-brand h1 {
+  font-size: clamp(1.35rem, 2vw, 2.25rem) !important;
+  line-height: 1.05 !important;
+}
+
+.data-upload-actions {
+  min-width: 0 !important;
+}
+
+.data-upload-action-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+.data-upload-grid,
+.data-upload-grid-wide {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: start !important;
+}
+
+.data-upload-dropzone,
+.data-upload-preview,
+.data-upload-history {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.data-upload-drop-area {
+  min-height: clamp(160px, 22vh, 260px) !important;
+  padding: clamp(14px, 1.5vw, 24px) !important;
+}
+
+.data-upload-drop-actions,
+.data-upload-actions-block {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.data-upload-file-chip,
+.data-upload-result-card,
+.data-upload-alert,
+.data-upload-detection,
+.data-upload-preview-panel {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+}
+
+.data-upload-detection-grid,
+.data-upload-stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)) !important;
+  gap: 8px !important;
+}
+
+.data-upload-tags {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+.data-upload-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+}
+
+.data-upload-table-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  border-radius: 12px !important;
+}
+
+.data-upload-table {
+  width: 100% !important;
+  min-width: 760px !important;
+}
+
+.data-upload-table th,
+.data-upload-table td {
+  overflow-wrap: anywhere !important;
+}
+
+.data-upload-issues {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+
+/* =========================================================
+   4. COMPANY PROFILE PAGE
+========================================================= */
+
+.company-profile-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.cp-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.cp-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px) !important;
+  gap: clamp(12px, 1.2vw, 20px) !important;
+  align-items: center !important;
+}
+
+.cp-hero-brand {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+.cp-hero-copy h1 {
+  font-size: clamp(1.55rem, 2.4vw, 2.75rem) !important;
+  line-height: 1.03 !important;
+}
+
+.cp-hero-copy p {
+  font-size: clamp(0.78rem, 0.8vw, 1rem) !important;
+  line-height: 1.35 !important;
+}
+
+.cp-hero-side {
+  min-width: 0 !important;
+}
+
+.cp-mini-stats {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)) !important;
+  gap: 8px !important;
+}
+
+.cp-section,
+.cp-section-overview {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.cp-section-heading {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+.cp-identity-grid,
+.cp-split-grid,
+.cp-values-grid,
+.cp-module-grid {
+  display: grid !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+}
+
+.cp-identity-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)) !important;
+}
+
+.cp-split-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)) !important;
+}
+
+.cp-values-grid,
+.cp-module-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)) !important;
+}
+
+.cp-identity-card,
+.cp-value-card,
+.cp-module-card,
+.cp-note-card,
+.cp-overview-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.cp-chip-list,
+.cp-inline-summary {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+
+/* =========================================================
+   5. REPORTS & DOWNLOADS PAGE
+========================================================= */
+
+.reports-download-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.rd-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.report-brand-title {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: center !important;
+}
+
+.report-brand-title h1 {
+  font-size: clamp(1.45rem, 2.2vw, 2.5rem) !important;
+  line-height: 1.05 !important;
+}
+
+.rd-hero-meta {
+  min-width: 0 !important;
+}
+
+.rd-filters {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.rd-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.7fr) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+  align-items: start !important;
+}
+
+.rd-card,
+.rd-main-card,
+.rd-danger-card,
+.rd-note {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+.rd-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)) !important;
+}
+
+.rd-button-stack {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+.rd-download-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)) !important;
+  gap: clamp(10px, 1vw, 16px) !important;
+}
+
+.rd-download-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: 92px !important;
+  overflow-wrap: anywhere !important;
+  text-align: left !important;
+}
+
+.reports-download-page .chart-title {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  justify-content: space-between !important;
+}
+
+.reports-download-page .panel:has(table),
+.reports-download-page table {
+  max-width: 100% !important;
+}
+
+
+/* =========================================================
+   6. SHARED SMALL-WINDOW POLISH
+========================================================= */
+
+@media (max-width: 1100px) {
+  .data-entry-hero,
+  .data-upload-hero,
+  .cp-hero,
+  .rd-hero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .data-upload-action-row,
+  .data-entry-actions {
+    justify-content: flex-start !important;
+  }
+
+  .rd-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .data-entry-table-header {
+    grid-template-columns: 1fr !important;
+    align-items: start !important;
+  }
+
+  .data-entry-actions {
+    justify-content: flex-start !important;
+  }
+
+  .data-entry-card-grid,
+  .data-upload-grid,
+  .data-upload-grid-wide,
+  .cp-identity-grid,
+  .cp-split-grid,
+  .cp-values-grid,
+  .cp-module-grid,
+  .rd-download-grid,
+  .rd-kpis {
+    grid-template-columns: 1fr !important;
+  }
+
+  .data-entry-grid {
+    min-width: 860px !important;
+  }
+
+  .data-upload-table {
+    min-width: 680px !important;
+  }
+
+  .data-entry-card,
+  .data-upload-card,
+  .cp-card,
+  .rd-card {
+    padding: 10px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .data-entry-grid {
+    min-width: 760px !important;
+  }
+
+  .data-upload-table {
+    min-width: 620px !important;
+  }
+
+  .sticky-action {
+    min-width: 110px !important;
+  }
+
+  .data-entry-hero h1,
+  .data-upload-brand h1,
+  .cp-hero-copy h1,
+  .report-brand-title h1 {
+    font-size: 1.35rem !important;
+  }
+}
