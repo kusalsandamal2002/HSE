@@ -1,23 +1,34 @@
-﻿import { useEffect, useState } from "react";
+﻿import { lazy, Suspense, useEffect, useState } from "react";
 import { clearToken, getToken } from "./lib/api";
 import { appName, companyLogoSrc, companyProfile } from "./lib/brand";
 import type { User } from "./types";
-import { LoginPage } from "./pages/LoginPage";
-import { MasterDashboardPage } from "./pages/MasterDashboardPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { CompanyProfilePage } from "./pages/CompanyProfilePage";
-import { IncidentsPage } from "./pages/IncidentsPage";
-import { MasterDataPage } from "./pages/MasterDataPage";
-import { ActionsPage } from "./pages/ActionsPage";
-import { MedicalPage } from "./pages/MedicalPage";
-import { ObservationsPage } from "./pages/ObservationsPage";
-import { WorkingHoursPage } from "./pages/WorkingHoursPage";
-import { ReportsPage } from "./pages/ReportsPage";
-import { TvControlPage } from "./pages/TvControlPage";
-import { EsgDashboardPage, EsgReportsPage } from "./pages/EsgModule";
-import { DataUploadCenterPage } from "./pages/DataUploadCenterPage";
-import { DataEntryCenterPage } from "./pages/DataEntryCenterPage";
-import { DataEntryTablePage } from "./pages/DataEntryTablePage";
+
+const LoginPage = lazy(() => import("./pages/LoginPage").then((m) => ({ default: m.LoginPage })));
+const MasterDashboardPage = lazy(() => import("./pages/MasterDashboardPage").then((m) => ({ default: m.MasterDashboardPage })));
+const DashboardPage = lazy(() => import("./pages/DashboardPage").then((m) => ({ default: m.DashboardPage })));
+const CompanyProfilePage = lazy(() => import("./pages/CompanyProfilePage").then((m) => ({ default: m.CompanyProfilePage })));
+const IncidentsPage = lazy(() => import("./pages/IncidentsPage").then((m) => ({ default: m.IncidentsPage })));
+const MasterDataPage = lazy(() => import("./pages/MasterDataPage").then((m) => ({ default: m.MasterDataPage })));
+const ActionsPage = lazy(() => import("./pages/ActionsPage").then((m) => ({ default: m.ActionsPage })));
+const MedicalPage = lazy(() => import("./pages/MedicalPage").then((m) => ({ default: m.MedicalPage })));
+const ObservationsPage = lazy(() => import("./pages/ObservationsPage").then((m) => ({ default: m.ObservationsPage })));
+const WorkingHoursPage = lazy(() => import("./pages/WorkingHoursPage").then((m) => ({ default: m.WorkingHoursPage })));
+const ReportsPage = lazy(() => import("./pages/ReportsPage").then((m) => ({ default: m.ReportsPage })));
+const TvControlPage = lazy(() => import("./pages/TvControlPage").then((m) => ({ default: m.TvControlPage })));
+const EsgDashboardPage = lazy(() => import("./pages/EsgModule").then((m) => ({ default: m.EsgDashboardPage })));
+const EsgReportsPage = lazy(() => import("./pages/EsgModule").then((m) => ({ default: m.EsgReportsPage })));
+const DataUploadCenterPage = lazy(() => import("./pages/DataUploadCenterPage").then((m) => ({ default: m.DataUploadCenterPage })));
+const DataEntryCenterPage = lazy(() => import("./pages/DataEntryCenterPage").then((m) => ({ default: m.DataEntryCenterPage })));
+const DataEntryTablePage = lazy(() => import("./pages/DataEntryTablePage").then((m) => ({ default: m.DataEntryTablePage })));
+
+function PageLoading({ label = "Loading module..." }: { label?: string }) {
+  return (
+    <div className="route-loading">
+      <span className="route-loading-spinner" />
+      <strong>{label}</strong>
+    </div>
+  );
+}
 
 const mainDashboardPages = [
   { key: "dashboard", path: "/dashboard", label: "Executive Dashboard" },
@@ -250,8 +261,9 @@ export function App() {
             </div>
           </header>
         )}
-        {renderPage()}
+        <Suspense fallback={<PageLoading />}>{renderPage()}</Suspense>
       </main>
     </div>
   );
 }
+

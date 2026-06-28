@@ -2887,3 +2887,33 @@ body.dashboard-presentation-mode .main {
     padding: 8px 10px !important;
   }
 }
+
+/* =========================================================
+   STEP 6 - ROUTE LAZY LOADING FALLBACK
+========================================================= */
+
+.route-loading {
+  width: 100%;
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 32px;
+  color: #dffbff;
+  text-align: center;
+}
+
+.route-loading-spinner {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 3px solid rgba(53, 246, 255, 0.18);
+  border-top-color: rgba(53, 246, 255, 0.95);
+  animation: route-loading-spin 0.9s linear infinite;
+}
+
+@keyframes route-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
