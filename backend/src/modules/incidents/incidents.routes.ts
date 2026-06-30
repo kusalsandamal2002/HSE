@@ -2,7 +2,7 @@ import { Router } from "express";
 import { Prisma, IncidentSeverity, RecordStatus } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
-import { requireAuth } from "../../middleware/auth.js";
+import { ADMIN_ONLY_ROLES, DATA_WRITE_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { generateCode, monthRange, toNumber, toStringValue } from "../../utils/http.js";
 import { nullableId, nullableText } from "../../utils/schema.js";
 
@@ -78,7 +78,7 @@ incidentsRouter.get("/:id", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-incidentsRouter.post("/", async (req, res, next) => {
+incidentsRouter.post("/", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = incidentSchema.parse(req.body);
     const data = await prisma.incident.create({
@@ -95,7 +95,7 @@ incidentsRouter.post("/", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-incidentsRouter.put("/:id", async (req, res, next) => {
+incidentsRouter.put("/:id", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = updateIncidentSchema.parse(req.body);
     const data = await prisma.incident.update({
@@ -110,7 +110,7 @@ incidentsRouter.put("/:id", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-incidentsRouter.delete("/:id", async (req, res, next) => {
+incidentsRouter.delete("/:id", requireRole(ADMIN_ONLY_ROLES), async (req, res, next) => {
   try {
     const data = await prisma.incident.update({ where: { id: req.params.id }, data: { isDeleted: true } });
     res.json(data);

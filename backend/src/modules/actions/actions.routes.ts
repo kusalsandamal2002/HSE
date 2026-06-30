@@ -2,7 +2,7 @@ import { Router } from "express";
 import { RecordStatus } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
-import { requireAuth } from "../../middleware/auth.js";
+import { ADMIN_ONLY_ROLES, DATA_WRITE_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { generateCode, toStringValue } from "../../utils/http.js";
 import { nullableId, nullableText } from "../../utils/schema.js";
 
@@ -39,7 +39,7 @@ actionsRouter.get("/", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-actionsRouter.post("/", async (req, res, next) => {
+actionsRouter.post("/", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = schema.parse(req.body);
     const data = await prisma.correctiveAction.create({
@@ -54,7 +54,7 @@ actionsRouter.post("/", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-actionsRouter.put("/:id", async (req, res, next) => {
+actionsRouter.put("/:id", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = schema.partial().parse(req.body);
     const data = await prisma.correctiveAction.update({
@@ -69,7 +69,7 @@ actionsRouter.put("/:id", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-actionsRouter.delete("/:id", async (req, res, next) => {
+actionsRouter.delete("/:id", requireRole(ADMIN_ONLY_ROLES), async (req, res, next) => {
   try { res.json(await prisma.correctiveAction.update({ where: { id: req.params.id }, data: { isDeleted: true } })); }
   catch (error) { next(error); }
 });

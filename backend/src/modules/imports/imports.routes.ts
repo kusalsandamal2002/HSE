@@ -3,7 +3,7 @@ import path from "node:path";
 import { Router } from "express";
 import multer from "multer";
 import { env } from "../../config/env.js";
-import { requireAuth, requireRole } from "../../middleware/auth.js";
+import { ADMIN_ONLY_ROLES, IMPORT_APPROVE_ROLES, IMPORT_UPLOAD_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { HttpError, toNumber, toStringValue } from "../../utils/http.js";
 import {
   approveImportBatch,
@@ -44,7 +44,7 @@ const upload = multer({
 
 importsRouter.use(requireAuth);
 
-importsRouter.post("/upload", upload.single("file"), async (req, res, next) => {
+importsRouter.post("/upload", requireRole(IMPORT_UPLOAD_ROLES), upload.single("file"), async (req, res, next) => {
   try {
     if (!req.file) {
       throw new HttpError(400, "Excel file is required");
@@ -73,7 +73,7 @@ importsRouter.get("/:batchId/preview", async (req, res, next) => {
   }
 });
 
-importsRouter.post("/:batchId/approve", requireRole(["ADMIN"]), async (req, res, next) => {
+importsRouter.post("/:batchId/approve", requireRole(IMPORT_APPROVE_ROLES), async (req, res, next) => {
   try {
     res.json(await approveImportBatch(req.params.batchId, req.user?.name ?? req.user?.email ?? null));
   } catch (error) {
@@ -81,11 +81,10 @@ importsRouter.post("/:batchId/approve", requireRole(["ADMIN"]), async (req, res,
   }
 });
 
-importsRouter.delete("/:batchId", requireRole(["ADMIN"]), async (req, res, next) => {
+importsRouter.delete("/:batchId", requireRole(ADMIN_ONLY_ROLES), async (req, res, next) => {
   try {
     res.json(await cancelImportBatch(req.params.batchId));
   } catch (error) {
     next(error);
   }
 });
-
