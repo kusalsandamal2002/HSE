@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
-import { requireAuth } from "../../middleware/auth.js";
+import { ADMIN_ONLY_ROLES, DATA_WRITE_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { generateCode, monthRange, toNumber, toStringValue } from "../../utils/http.js";
 import { nullableId, nullableText } from "../../utils/schema.js";
 
@@ -32,7 +32,7 @@ medicalRouter.get("/", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-medicalRouter.post("/", async (req, res, next) => {
+medicalRouter.post("/", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = schema.parse(req.body);
     const created = await prisma.$transaction(async (tx) => {
@@ -50,7 +50,7 @@ medicalRouter.post("/", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-medicalRouter.put("/:id", async (req, res, next) => {
+medicalRouter.put("/:id", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = schema.partial().parse(req.body);
     const updated = await prisma.$transaction(async (tx) => {
@@ -68,7 +68,7 @@ medicalRouter.put("/:id", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-medicalRouter.delete("/:id", async (req, res, next) => {
+medicalRouter.delete("/:id", requireRole(ADMIN_ONLY_ROLES), async (req, res, next) => {
   try {
     const deleted = await prisma.$transaction(async (tx) => {
       const expense = await tx.medicalExpense.update({ where: { id: req.params.id }, data: { isDeleted: true } });
@@ -81,3 +81,4 @@ medicalRouter.delete("/:id", async (req, res, next) => {
     res.json(deleted);
   } catch (error) { next(error); }
 });
+

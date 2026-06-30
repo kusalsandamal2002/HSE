@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { Prisma } from "@prisma/client";
-import { requireAuth } from "../../middleware/auth.js";
+import { ADMIN_ONLY_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { prisma } from "../../lib/prisma.js";
 import { getDashboardSummary } from "../dashboard/dashboard.service.js";
 import { monthRange, toNumber, toStringValue } from "../../utils/http.js";
@@ -60,7 +60,7 @@ reportsRouter.get("/yearly", async (req, res, next) => {
     res.json({ reportType: "YEARLY_HSE_REPORT", generatedAt: new Date().toISOString(), filters, dashboard, incidents, actions, expenses, observations, workingHours });
   } catch (error) { next(error); }
 });
-reportsRouter.get("/backup/system", async (_req, res, next) => {
+reportsRouter.get("/backup/system", requireRole(ADMIN_ONLY_ROLES), async (_req, res, next) => {
   try {
     const generatedAt = new Date();
     const stamp = generatedAt.toISOString().slice(0, 19).replace(/[:T]/g, "-");
@@ -195,3 +195,4 @@ reportsRouter.get("/backup/system", async (_req, res, next) => {
     next(error);
   }
 });
+

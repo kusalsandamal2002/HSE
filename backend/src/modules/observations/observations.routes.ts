@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ObservationType, RecordStatus, RiskLevel } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
-import { requireAuth } from "../../middleware/auth.js";
+import { ADMIN_ONLY_ROLES, DATA_WRITE_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { generateCode, monthRange, toNumber, toStringValue } from "../../utils/http.js";
 import { nullableId, nullableText } from "../../utils/schema.js";
 
@@ -44,7 +44,7 @@ observationsRouter.get("/", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-observationsRouter.post("/", async (req, res, next) => {
+observationsRouter.post("/", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = schema.parse(req.body);
     const data = await prisma.observation.create({
@@ -55,7 +55,7 @@ observationsRouter.post("/", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-observationsRouter.put("/:id", async (req, res, next) => {
+observationsRouter.put("/:id", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = schema.partial().parse(req.body);
     const data = await prisma.observation.update({
@@ -67,7 +67,8 @@ observationsRouter.put("/:id", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-observationsRouter.delete("/:id", async (req, res, next) => {
+observationsRouter.delete("/:id", requireRole(ADMIN_ONLY_ROLES), async (req, res, next) => {
   try { res.json(await prisma.observation.update({ where: { id: req.params.id }, data: { isDeleted: true } })); }
   catch (error) { next(error); }
 });
+

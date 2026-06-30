@@ -1,6 +1,6 @@
-﻿import { Router } from "express";
+import { Router } from "express";
 import { prisma } from "../../lib/prisma.js";
-import { requireAuth } from "../../middleware/auth.js";
+import { ADMIN_ONLY_ROLES, CONFIG_WRITE_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { HttpError } from "../../utils/http.js";
 
 export const dataEntryRouter = Router();
@@ -460,7 +460,7 @@ dataEntryRouter.get("/:tableKey", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-dataEntryRouter.post("/:tableKey", async (req, res, next) => {
+dataEntryRouter.post("/:tableKey", requireRole(CONFIG_WRITE_ROLES), async (req, res, next) => {
   try {
     const config = getConfig(req.params.tableKey);
     const model = getModel(config);
@@ -470,7 +470,7 @@ dataEntryRouter.post("/:tableKey", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-dataEntryRouter.put("/:tableKey/:id", async (req, res, next) => {
+dataEntryRouter.put("/:tableKey/:id", requireRole(CONFIG_WRITE_ROLES), async (req, res, next) => {
   try {
     const config = getConfig(req.params.tableKey);
     const model = getModel(config);
@@ -480,7 +480,7 @@ dataEntryRouter.put("/:tableKey/:id", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-dataEntryRouter.delete("/:tableKey/:id", async (req, res, next) => {
+dataEntryRouter.delete("/:tableKey/:id", requireRole(ADMIN_ONLY_ROLES), async (req, res, next) => {
   try {
     const config = getConfig(req.params.tableKey);
     const model = getModel(config);
@@ -499,5 +499,6 @@ dataEntryRouter.delete("/:tableKey/:id", async (req, res, next) => {
     res.json(normalizeRow(deleted, config));
   } catch (error) { next(error); }
 });
+
 
 

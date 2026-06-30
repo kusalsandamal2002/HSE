@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
-import { requireAuth } from "../../middleware/auth.js";
+import { ADMIN_ONLY_ROLES, DATA_WRITE_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { toNumber, toStringValue } from "../../utils/http.js";
 import { nullableId, nullableText } from "../../utils/schema.js";
 
@@ -33,7 +33,7 @@ workingHoursRouter.get("/", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-workingHoursRouter.post("/", async (req, res, next) => {
+workingHoursRouter.post("/", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = schema.parse(req.body);
     const existing = await prisma.workingHours.findFirst({
@@ -46,14 +46,15 @@ workingHoursRouter.post("/", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-workingHoursRouter.put("/:id", async (req, res, next) => {
+workingHoursRouter.put("/:id", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = schema.partial().parse(req.body);
     res.json(await prisma.workingHours.update({ where: { id: req.params.id }, data: body, include: { department: true } }));
   } catch (error) { next(error); }
 });
 
-workingHoursRouter.delete("/:id", async (req, res, next) => {
+workingHoursRouter.delete("/:id", requireRole(ADMIN_ONLY_ROLES), async (req, res, next) => {
   try { res.json(await prisma.workingHours.delete({ where: { id: req.params.id } })); }
   catch (error) { next(error); }
 });
+

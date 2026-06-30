@@ -31,6 +31,11 @@ export const IMPORT_APPROVE_ROLES = [
   Roles.HSE_MANAGER,
 ] as const;
 
+export const CONFIG_WRITE_ROLES = [
+  Roles.ADMIN,
+  Roles.HSE_MANAGER,
+] as const;
+
 export type AuthUser = {
   id: string;
   email: string;
@@ -79,3 +84,4 @@ export function requireRole(allowedRoles: readonly string[]) {
     next();
   };
 }
+

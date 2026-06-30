@@ -6,7 +6,7 @@ import { z } from "zod";
 import { AttachmentOwnerType } from "@prisma/client";
 import { env } from "../../config/env.js";
 import { prisma } from "../../lib/prisma.js";
-import { requireAuth } from "../../middleware/auth.js";
+import { DATA_WRITE_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 
 export const attachmentsRouter = Router();
 attachmentsRouter.use(requireAuth);
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
-attachmentsRouter.post("/", upload.single("file"), async (req, res, next) => {
+attachmentsRouter.post("/", requireRole(DATA_WRITE_ROLES), upload.single("file"), async (req, res, next) => {
   try {
     const body = z.object({ ownerType: z.nativeEnum(AttachmentOwnerType), ownerId: z.string().min(1) }).parse(req.body);
     if (!req.file) return res.status(400).json({ message: "File is required" });
@@ -49,3 +49,4 @@ attachmentsRouter.get("/:ownerType/:ownerId", async (req, res, next) => {
     res.json(data);
   } catch (error) { next(error); }
 });
+
