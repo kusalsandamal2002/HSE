@@ -1,19 +1,95 @@
+import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 
+dotenv.config();
+
 const prisma = new PrismaClient();
+
+const DEFAULT_DEV_ADMIN_PASSWORD = "Admin@123";
+
+function validateProductionAdminPassword(password: string) {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  if (!isProduction) return;
+
+  const strongEnough =
+    password.length >= 10 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /[0-9]/.test(password) &&
+    /[^A-Za-z0-9]/.test(password);
+
+  if (!strongEnough) {
+    throw new Error(
+      "ADMIN_PASSWORD must be at least 10 characters and include uppercase, lowercase, number, and symbol in production."
+    );
+  }
+
+  if (password === DEFAULT_DEV_ADMIN_PASSWORD) {
+    throw new Error("Default development admin password cannot be used in production.");
+  }
+}
 
 async function upsertByName(model: any, name: string, extra: Record<string, unknown> = {}) {
   return model.upsert({ where: { name }, update: extra, create: { name, ...extra } });
 }
 
-async function main() {
-  const passwordHash = await bcrypt.hash("Admin@123", 10);
-  await prisma.user.upsert({
+async function upsertAdminUser() {
+  const configuredPassword = process.env.ADMIN_PASSWORD;
+  const adminPassword = configuredPassword || DEFAULT_DEV_ADMIN_PASSWORD;
+
+  validateProductionAdminPassword(adminPassword);
+
+  const existingAdmin = await prisma.user.findUnique({
     where: { email: "admin@hse.local" },
-    update: { passwordHash, role: "ADMIN", isActive: true },
-    create: { name: "System Admin", email: "admin@hse.local", passwordHash, role: "ADMIN" },
   });
+
+  if (existingAdmin) {
+    const updateData: Record<string, unknown> = {
+      name: "System Admin",
+      role: "ADMIN",
+      isActive: true,
+    };
+
+    if (configuredPassword) {
+      updateData.passwordHash = await bcrypt.hash(configuredPassword, 10);
+    }
+
+    await prisma.user.update({
+      where: { email: "admin@hse.local" },
+      data: updateData,
+    });
+
+    console.log(
+      configuredPassword
+        ? "Admin user updated with ADMIN_PASSWORD from environment."
+        : "Admin user exists. Password was preserved because ADMIN_PASSWORD was not set."
+    );
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
+
+  await prisma.user.create({
+    data: {
+      name: "System Admin",
+      email: "admin@hse.local",
+      passwordHash,
+      role: "ADMIN",
+      isActive: true,
+    },
+  });
+
+  console.log(
+    configuredPassword
+      ? "Admin user created with ADMIN_PASSWORD from environment."
+      : "Admin user created with development default password. Change it before production use."
+  );
+}
+
+async function main() {
+  await upsertAdminUser();
 
   const departments = [
     ["PROD", "Production"],
@@ -93,7 +169,7 @@ async function main() {
     },
   });
 
-  console.log("Seed complete. Login: admin@hse.local / Admin@123");
+  console.log("Seed complete.");
 }
 
 main().finally(async () => prisma.$disconnect());
