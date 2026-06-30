@@ -1,5 +1,5 @@
-ï»¿import { lazy, Suspense, useEffect, useState } from "react";
-import { clearToken, getToken } from "./lib/api";
+import { lazy, Suspense, useEffect, useState, type FormEvent } from "react";
+import { api, clearToken, getToken } from "./lib/api";
 import { appName, companyLogoSrc, companyProfile } from "./lib/brand";
 import type { User } from "./types";
 
@@ -121,6 +121,132 @@ function getDataEntryTableKey(routePath: string) {
   return parts[0] === "data-entry" ? parts[1] || "" : "";
 }
 
+function ChangePasswordModal({
+  onClose,
+  onPasswordChanged,
+}: {
+  onClose: () => void;
+  onPasswordChanged: () => void;
+}) {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (newPassword !== confirmPassword) {
+      setError("New password and confirmation do not match.");
+      return;
+    }
+
+    const strongEnough =
+      newPassword.length >= 10 &&
+      /[A-Z]/.test(newPassword) &&
+      /[a-z]/.test(newPassword) &&
+      /[0-9]/.test(newPassword) &&
+      /[^A-Za-z0-9]/.test(newPassword);
+
+    if (!strongEnough) {
+      setError("Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const result = await api<{ message: string }>("/api/auth/change-password", {
+        method: "POST",
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      });
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setMessage(`${result.message}. Please login again.`);
+      window.setTimeout(onPasswordChanged, 1200);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Password change failed.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="password-modal-backdrop">
+      <section className="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
+        <div className="password-modal-header">
+          <div>
+            <p>Account Security</p>
+            <h2 id="password-modal-title">Change Password</h2>
+          </div>
+          <button type="button" onClick={onClose} disabled={saving} aria-label="Close password change dialog">
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="password-modal-form">
+          <label>
+            Current password
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={(event) => setCurrentPassword(event.target.value)}
+              autoComplete="current-password"
+              required
+            />
+          </label>
+
+          <label>
+            New password
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              autoComplete="new-password"
+              required
+            />
+          </label>
+
+          <label>
+            Confirm new password
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              autoComplete="new-password"
+              required
+            />
+          </label>
+
+          <small className="password-help">
+            Minimum 10 characters with uppercase, lowercase, number, and symbol.
+          </small>
+
+          {error && <div className="password-alert password-alert-error">{error}</div>}
+          {message && <div className="password-alert password-alert-success">{message}</div>}
+
+          <div className="password-modal-actions">
+            <button type="button" onClick={onClose} disabled={saving}>
+              Cancel
+            </button>
+            <button type="submit" disabled={saving}>
+              {saving ? "Saving..." : "Change Password"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
+
 export function App() {
   const [routePath, setRoutePath] = useState(window.location.pathname);
   const [page, setPage] = useState<PageKey>(() => resolvePage(window.location.pathname));
@@ -129,6 +255,7 @@ export function App() {
     return raw ? JSON.parse(raw) : null;
   });
   const [hasToken, setHasToken] = useState(Boolean(getToken()));
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     const onPopState = () => {
@@ -260,15 +387,23 @@ export function App() {
                 <span>{user.name}</span>
                 <small>{user.role.replace(/_/g, " ")}</small>
               </div>
-              <button onClick={handleLogout}>Logout</button>
+              <button type="button" onClick={() => setShowPasswordModal(true)}>Change Password</button>
+              <button type="button" onClick={handleLogout}>Logout</button>
             </div>
           </header>
         )}
         <Suspense fallback={<PageLoading />}>{renderPage()}</Suspense>
+        {showPasswordModal && (
+          <ChangePasswordModal
+            onClose={() => setShowPasswordModal(false)}
+            onPasswordChanged={handleLogout}
+          />
+        )}
       </main>
     </div>
   );
 }
+
 
 
 
