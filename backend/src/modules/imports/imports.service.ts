@@ -32,13 +32,40 @@ function sha256(filePath: string) {
   return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
+function sanitizeJsonValue(value: unknown): Prisma.InputJsonValue {
+  if (value === undefined) return null;
+  if (value === null) return null;
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeJsonValue(item)) as Prisma.InputJsonArray;
+  }
+
+  if (typeof value === "object") {
+    const output: Record<string, Prisma.InputJsonValue> = {};
+    for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+      output[key] = sanitizeJsonValue(item);
+    }
+    return output as Prisma.InputJsonObject;
+  }
+
+  if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") {
+    return value;
+  }
+
+  return String(value);
+}
+
 function toIssueRecord(issue: ImportIssue) {
   return {
     sectionKey: issue.sectionKey,
     severity: issue.severity,
     code: issue.code,
     message: issue.message,
-    detailsJson: issue.details ? (issue.details as Prisma.InputJsonValue) : undefined,
+    detailsJson: issue.details ? sanitizeJsonValue(issue.details) : undefined,
   };
 }
 
@@ -209,7 +236,7 @@ async function createStoredBatch(
           confidence: section.confidence,
           rowCount: section.rowCount,
           summary: section.summary,
-          metadataJson: section.metadata ? (section.metadata as Prisma.InputJsonValue) : undefined,
+          metadataJson: section.metadata ? sanitizeJsonValue(section.metadata) : undefined,
         })),
       },
       previewRows: {
@@ -217,10 +244,10 @@ async function createStoredBatch(
           section.rows.map((row) => ({
             sectionKey: row.sectionKey,
             rowIndex: row.rowIndex,
-            rawJson: row.rawJson as Prisma.InputJsonValue,
-            mappedJson: row.mappedJson as Prisma.InputJsonValue,
+            rawJson: sanitizeJsonValue(row.rawJson),
+            mappedJson: sanitizeJsonValue(row.mappedJson),
             status: row.status,
-            validationJson: row.validation.length ? (row.validation as Prisma.InputJsonValue) : undefined,
+            validationJson: row.validation.length ? sanitizeJsonValue(row.validation) : undefined,
           })),
         ),
       },
@@ -433,5 +460,6 @@ export async function approveImportBatch(batchId: string, approvedBy: string | n
     return buildPreviewResponse(failed);
   }
 }
+
 
 
