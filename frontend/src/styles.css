@@ -5599,3 +5599,24 @@ textarea {
     flex-direction: column;
   }
 }
+
+/* User Management form checkbox alignment */
+.data-entry-checkbox {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  width: fit-content !important;
+  margin: 8px 0 4px !important;
+  color: #e2e8f0 !important;
+  font-weight: 700 !important;
+}
+
+.data-entry-checkbox input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  margin: 0 !important;
+  accent-color: #22d3ee;
+  box-shadow: none !important;
+}
