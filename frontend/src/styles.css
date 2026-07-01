@@ -5651,25 +5651,25 @@ select option:hover {
 select:focus {
   border-color: #22d3ee !important;
 }
-/* Dashboard presentation professional control START */
+/* Dashboard presentation professional control v2 START */
 
 .dashboard-fullscreen-trigger {
-  border: 1px solid rgba(34, 211, 238, 0.48) !important;
+  border: 1px solid rgba(34, 211, 238, 0.42) !important;
   background:
-    radial-gradient(circle at 30% 20%, rgba(34, 211, 238, 0.24), transparent 44%),
+    radial-gradient(circle at 26% 18%, rgba(34, 211, 238, 0.24), transparent 42%),
     linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(8, 47, 73, 0.92)) !important;
   color: #e0faff !important;
   cursor: pointer !important;
   font-weight: 900 !important;
   box-shadow:
     0 0 0 1px rgba(34, 211, 238, 0.08),
-    0 12px 24px rgba(0, 0, 0, 0.24) !important;
+    0 12px 24px rgba(0, 0, 0, 0.22) !important;
 }
 
 .dashboard-fullscreen-trigger:hover {
   border-color: rgba(34, 211, 238, 0.9) !important;
   background:
-    radial-gradient(circle at 30% 20%, rgba(34, 211, 238, 0.35), transparent 44%),
+    radial-gradient(circle at 26% 18%, rgba(34, 211, 238, 0.36), transparent 42%),
     linear-gradient(135deg, rgba(8, 145, 178, 0.98), rgba(14, 116, 144, 0.92)) !important;
   color: #ffffff !important;
 }
@@ -5682,6 +5682,7 @@ select:focus {
   stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
+  flex: 0 0 auto;
 }
 
 .dashboard-fullscreen-compact {
@@ -5697,42 +5698,52 @@ select:focus {
   justify-content: center !important;
 }
 
-.dashboard-fullscreen-compact .dashboard-fullscreen-label {
-  display: none !important;
-}
-
 .dashboard-presentation-sidebar-host {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  margin: 14px 10px 16px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(34, 211, 238, 0.24);
+  background:
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.12), transparent 50%),
+    rgba(15, 23, 42, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.06);
 }
 
 .dashboard-presentation-sidebar-title {
-  margin: 0 0 8px;
+  margin: 0 0 2px;
   color: #22d3ee;
-  font-size: 0.72rem;
-  font-weight: 900;
+  font-size: 0.68rem;
+  font-weight: 950;
   letter-spacing: 0.08em;
+}
+
+.dashboard-presentation-sidebar-subtitle {
+  margin: 0 0 10px;
+  color: rgba(203, 213, 225, 0.74);
+  font-size: 0.72rem;
+  line-height: 1.25;
 }
 
 .dashboard-fullscreen-sidebar {
   width: 100% !important;
-  min-height: 42px !important;
-  padding: 10px 12px !important;
-  border-radius: 14px !important;
+  min-height: 40px !important;
+  padding: 9px 10px !important;
+  border-radius: 12px !important;
 
   display: inline-flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  gap: 10px !important;
+  gap: 9px !important;
 
-  font-size: 0.88rem !important;
+  font-size: 0.82rem !important;
   text-align: left !important;
 }
 
 .dashboard-fullscreen-sidebar .dashboard-fullscreen-label {
   display: inline !important;
   white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dashboard-fullscreen-floating {
@@ -5777,11 +5788,16 @@ select:focus {
     border-radius: 11px !important;
   }
 
+  .dashboard-presentation-sidebar-host {
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
   .dashboard-fullscreen-floating {
     top: 54px !important;
     right: 14px !important;
   }
 }
 
-/* Dashboard presentation professional control END */
+/* Dashboard presentation professional control v2 END */
 
