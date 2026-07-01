@@ -5,6 +5,7 @@ import { prisma } from "../../lib/prisma.js";
 import { ADMIN_ONLY_ROLES, DATA_WRITE_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { generateCode, monthRange, toNumber, toStringValue } from "../../utils/http.js";
 import { nullableId, nullableText } from "../../utils/schema.js";
+import { writeAuditLog } from "../../utils/audit.js";
 
 export const incidentsRouter = Router();
 incidentsRouter.use(requireAuth);
@@ -91,6 +92,14 @@ incidentsRouter.post("/", requireRole(DATA_WRITE_ROLES), async (req, res, next) 
       },
       include,
     });
+    await writeAuditLog({
+      user: req.user,
+      action: "CREATE_INCIDENT",
+      entity: "Incident",
+      entityId: data.id,
+      after: data,
+    });
+
     res.status(201).json(data);
   } catch (error) { next(error); }
 });
@@ -98,6 +107,7 @@ incidentsRouter.post("/", requireRole(DATA_WRITE_ROLES), async (req, res, next) 
 incidentsRouter.put("/:id", requireRole(DATA_WRITE_ROLES), async (req, res, next) => {
   try {
     const body = updateIncidentSchema.parse(req.body);
+    const before = await prisma.incident.findUnique({ where: { id: req.params.id } });
     const data = await prisma.incident.update({
       where: { id: req.params.id },
       data: {
@@ -106,13 +116,35 @@ incidentsRouter.put("/:id", requireRole(DATA_WRITE_ROLES), async (req, res, next
       },
       include,
     });
+
+    await writeAuditLog({
+      user: req.user,
+      action: "UPDATE_INCIDENT",
+      entity: "Incident",
+      entityId: data.id,
+      before,
+      after: data,
+    });
+
     res.json(data);
   } catch (error) { next(error); }
 });
 
 incidentsRouter.delete("/:id", requireRole(ADMIN_ONLY_ROLES), async (req, res, next) => {
   try {
+    const before = await prisma.incident.findUnique({ where: { id: req.params.id } });
     const data = await prisma.incident.update({ where: { id: req.params.id }, data: { isDeleted: true } });
+
+    await writeAuditLog({
+      user: req.user,
+      action: "DELETE_INCIDENT",
+      entity: "Incident",
+      entityId: data.id,
+      before,
+      after: data,
+    });
+
     res.json(data);
   } catch (error) { next(error); }
 });
+
