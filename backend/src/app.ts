@@ -7,6 +7,7 @@ import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/error.js";
 import { healthRouter } from "./modules/health/health.routes.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
+import { usersRouter } from "./modules/users/users.routes.js";
 import { masterRouter } from "./modules/master/master.routes.js";
 import { incidentsRouter } from "./modules/incidents/incidents.routes.js";
 import { actionsRouter } from "./modules/actions/actions.routes.js";
@@ -33,6 +34,7 @@ app.use(morgan("dev"));
 
 app.use("/api/health", healthRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
 app.use("/api/master", masterRouter);
 app.use("/api/incidents", incidentsRouter);
 app.use("/api/corrective-actions", actionsRouter);
@@ -56,6 +58,7 @@ app.get("/tv", (_req, res) => res.sendFile(path.join(tvDir, "tv.html")));
 
 app.use((_req, res) => res.status(404).json({ message: "Route not found" }));
 app.use(errorHandler);
+
 
 
 

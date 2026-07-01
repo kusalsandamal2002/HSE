@@ -4,6 +4,7 @@ import { appName, companyLogoSrc, companyProfile } from "./lib/brand";
 import type { User } from "./types";
 
 const LoginPage = lazy(() => import("./pages/LoginPage").then((m) => ({ default: m.LoginPage })));
+const UserManagementPage = lazy(() => import("./pages/UserManagementPage").then((m) => ({ default: m.UserManagementPage })));
 const MasterDashboardPage = lazy(() => import("./pages/MasterDashboardPage").then((m) => ({ default: m.MasterDashboardPage })));
 const DashboardPage = lazy(() => import("./pages/DashboardPage").then((m) => ({ default: m.DashboardPage })));
 const CompanyProfilePage = lazy(() => import("./pages/CompanyProfilePage").then((m) => ({ default: m.CompanyProfilePage })));
@@ -146,7 +147,7 @@ function canAccessPage(role: AccessRole | undefined, page: PageKey) {
   const dashboardViewers = ["ADMIN", "HSE_MANAGER", "HSE_OFFICER", "DEPARTMENT_HEAD", "MANAGEMENT_VIEWER"];
   const operationalUsers = ["ADMIN", "HSE_MANAGER", "HSE_OFFICER"];
 
-  if (page === "audit-logs") return roleIn(role, ["ADMIN"]);
+  if (page === "audit-logs" || page === "users") return roleIn(role, ["ADMIN"]);
 
   if (roleIn(role, fullAccess)) return true;
 
@@ -406,6 +407,7 @@ export function App() {
       case "company": return <CompanyProfilePage />;
       case "reports": return <ReportsPage user={user} />;
       case "audit-logs": return <AuditTrailPage />;
+      case "users": return <UserManagementPage />;
       case "tv": return <TvControlPage />;
 
       /* Hidden legacy routes still work if opened directly */
@@ -500,6 +502,7 @@ export function App() {
     </div>
   );
 }
+
 
 
 
