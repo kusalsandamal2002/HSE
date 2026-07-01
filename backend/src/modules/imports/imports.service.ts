@@ -163,15 +163,16 @@ async function createStoredBatch(
     duplicateBatchId?: string | null;
   },
 ) {
-  const status = params.inspection.errorCount > 0 || params.inspection.workbookType === "UNKNOWN"
+  const hasDuplicate = Boolean(params.duplicateBatchId);
+  const status = params.inspection.errorCount > 0 || params.inspection.workbookType === "UNKNOWN" || hasDuplicate
     ? "VALIDATION_FAILED"
     : "READY_FOR_APPROVAL";
   const duplicateIssue: ImportIssue | null = params.duplicateBatchId
     ? {
         sectionKey: null,
-        severity: "INFO",
+        severity: "ERROR",
         code: "duplicate_file_hash",
-        message: `A prior import batch already exists for this file hash (${params.duplicateBatchId}).`,
+        message: `This exact file has already been uploaded before (${params.duplicateBatchId}). Duplicate uploads are blocked to prevent repeated imports.`,
         details: { duplicateBatchId: params.duplicateBatchId },
       }
     : null;
@@ -187,8 +188,8 @@ async function createStoredBatch(
       uploadedBy: params.uploadedBy,
       rowCount: params.inspection.rowCount,
       validRowCount: params.inspection.validRowCount,
-      warningCount: params.inspection.warningCount + (duplicateIssue ? 1 : 0),
-      errorCount: params.inspection.errorCount,
+      warningCount: params.inspection.warningCount,
+      errorCount: params.inspection.errorCount + (duplicateIssue ? 1 : 0),
       summaryJson: buildSummary(params.inspection, params.fileHash, params.duplicateBatchId) as Prisma.InputJsonValue,
       file: {
         create: {
@@ -432,4 +433,5 @@ export async function approveImportBatch(batchId: string, approvedBy: string | n
     return buildPreviewResponse(failed);
   }
 }
+
 
