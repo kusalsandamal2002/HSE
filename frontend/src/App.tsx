@@ -121,6 +121,92 @@ function getDataEntryTableKey(routePath: string) {
   return parts[0] === "data-entry" ? parts[1] || "" : "";
 }
 
+type AccessRole =
+  | "ADMIN"
+  | "HSE_MANAGER"
+  | "HSE_OFFICER"
+  | "DEPARTMENT_HEAD"
+  | "MANAGEMENT_VIEWER"
+  | "TV_DISPLAY"
+  | string;
+
+function roleIn(role: AccessRole | undefined, allowed: readonly string[]) {
+  return Boolean(role && allowed.includes(role));
+}
+
+function defaultPathForRole(role: AccessRole | undefined) {
+  if (role === "TV_DISPLAY") return "/tv-dashboard";
+  return "/dashboard";
+}
+
+function canAccessPage(role: AccessRole | undefined, page: PageKey) {
+  const fullAccess = ["ADMIN", "HSE_MANAGER"];
+  const dashboardViewers = ["ADMIN", "HSE_MANAGER", "HSE_OFFICER", "DEPARTMENT_HEAD", "MANAGEMENT_VIEWER"];
+  const operationalUsers = ["ADMIN", "HSE_MANAGER", "HSE_OFFICER"];
+
+  if (roleIn(role, fullAccess)) return true;
+
+  switch (page) {
+    case "dashboard":
+    case "master-dashboard":
+    case "esg-dashboard":
+    case "company":
+    case "reports":
+      return roleIn(role, dashboardViewers);
+
+    case "data-upload":
+    case "esg-upload":
+      return roleIn(role, operationalUsers);
+
+    case "data-quality":
+      return roleIn(role, dashboardViewers);
+
+    case "tv":
+      return roleIn(role, ["ADMIN", "HSE_MANAGER", "TV_DISPLAY"]);
+
+    case "incidents":
+    case "actions":
+    case "medical":
+    case "observations":
+    case "hours":
+      return roleIn(role, operationalUsers);
+
+    case "data-entry":
+    case "master":
+      return roleIn(role, fullAccess);
+
+    case "esg-reports":
+      return roleIn(role, dashboardViewers);
+
+    default:
+      return false;
+  }
+}
+
+function AccessDeniedPage({
+  role,
+  pageLabel,
+  onNavigate,
+}: {
+  role: string;
+  pageLabel: string;
+  onNavigate: (path: string) => void;
+}) {
+  return (
+    <section className="panel access-denied-panel">
+      <span className="rd-kicker">Access Control</span>
+      <h2>Permission required</h2>
+      <p>
+        Your current role <strong>{role.replace(/_/g, " ")}</strong> does not have access to <strong>{pageLabel}</strong>.
+      </p>
+      <button type="button" className="primary" onClick={() => onNavigate(defaultPathForRole(role))}>
+        Go to allowed workspace
+      </button>
+    </section>
+  );
+}
+
+
 function ChangePasswordModal({
   onClose,
   onPasswordChanged,
@@ -292,6 +378,12 @@ export function App() {
     return <LoginPage onLogin={(u) => { setUser(u); setHasToken(true); }} />;
   }
 
+  const visibleNavSections = navSections
+    .map((section) => ({
+      ...section,
+      pages: section.pages.filter((item) => canAccessPage(user.role, item.key)),
+    }))
+    .filter((section) => section.pages.length > 0);
   function renderPage() {
     switch (page) {
       case "dashboard": return <DashboardPage onNavigate={(next) => navigate(next)} />;
@@ -308,7 +400,7 @@ export function App() {
       case "data-upload": return <DataUploadCenterPage scope="all" onNavigate={(next) => navigate(next)} onLogout={handleLogout} user={user} />;
 
       case "company": return <CompanyProfilePage />;
-      case "reports": return <ReportsPage />;
+      case "reports": return <ReportsPage user={user} />;
       case "tv": return <TvControlPage />;
 
       /* Hidden legacy routes still work if opened directly */
@@ -338,7 +430,7 @@ export function App() {
           </div>
         </div>
 
-        {navSections.map((section) => (
+        {visibleNavSections.map((section) => (
           <section key={section.title} className="sidebar-section">
             <span className="sidebar-section-title">{section.title}</span>
             <nav aria-label={`${section.title} navigation`}>
@@ -403,6 +495,8 @@ export function App() {
     </div>
   );
 }
+
+
 
 
 

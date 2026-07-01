@@ -1,12 +1,15 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { api } from "../lib/api";
 import { months } from "../lib/enums";
 import { useLookups } from "../hooks/useLookups";
 import { EmptyState, Field, SelectLookup } from "../components/FormTools";
 import { appName, brandName, businessUnitName, companyLogoSrc, companyName, companyProfile } from "../lib/brand";
 import { downloadCsv, formatCurrency, formatDate, formatHours, formatNumber } from "../lib/format";
+import type { User } from "../types";
 
 type ReportMode = "monthly" | "yearly";
+
+type ReportsPageProps = { user?: User | null };
 
 function buildReportQuery(type: ReportMode, year: number, month: number, departmentId: string) {
   const query = new URLSearchParams({ year: String(year) });
@@ -31,7 +34,7 @@ function safeDateStamp() {
   return new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
 }
 
-export function ReportsPage() {
+export function ReportsPage({ user }: ReportsPageProps) {
   const { lookups } = useLookups();
   const [year, setYear] = useState(2026);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -41,6 +44,7 @@ export function ReportsPage() {
   const [loading, setLoading] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const canUseFullBackup = user?.role === "ADMIN";
 
   async function load(type: ReportMode) {
     const query = buildReportQuery(type, year, month, departmentId);
@@ -278,14 +282,15 @@ export function ReportsPage() {
             <button onClick={() => downloadReportJson("yearly")} disabled={Boolean(loading)}>Download Yearly JSON</button>
           </div>
         </section>
-
-        <section className="panel rd-card rd-danger-card">
-          <span className="rd-kicker">System Backup</span>
-          <h2>Full System JSON Backup</h2>
-          <p>Exports master data, HSE records, ESG snapshots, company profile, TV settings and import history. Password hashes are excluded.</p>
-          <button className="primary" onClick={downloadFullBackup} disabled={Boolean(loading)}>Download Full Backup</button>
-          <small>This is a JSON export archive, not a one-click database restore file.</small>
-        </section>
+        {canUseFullBackup && (
+          <section className="panel rd-card rd-danger-card">
+            <span className="rd-kicker">System Backup</span>
+            <h2>Full System JSON Backup</h2>
+            <p>Exports master data, HSE records, ESG snapshots, company profile, TV settings and import history. Password hashes are excluded.</p>
+            <button className="primary" onClick={downloadFullBackup} disabled={Boolean(loading)}>Download Full Backup</button>
+            <small>This is a JSON export archive, not a one-click database restore file.</small>
+          </section>
+        )}
       </div>
 
       <section className="panel">
@@ -315,3 +320,4 @@ export function ReportsPage() {
     </section>
   );
 }
+

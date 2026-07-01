@@ -5299,3 +5299,20 @@ textarea {
   margin-top: 4px;
 }
 
+
+.access-denied-panel {
+  max-width: 720px;
+  margin: 32px auto;
+  padding: 28px;
+  text-align: left;
+}
+
+.access-denied-panel h2 {
+  margin: 8px 0;
+}
+
+.access-denied-panel p {
+  max-width: 560px;
+  margin-bottom: 18px;
+}
+

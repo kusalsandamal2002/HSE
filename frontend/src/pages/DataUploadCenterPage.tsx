@@ -190,6 +190,9 @@ function Badge({ tone, children }: { tone: "success" | "warning" | "danger" | "i
   return <span className={`data-upload-badge data-upload-badge-${tone}`}>{children}</span>;
 }
 
+function hasUploadRole(user: User | null | undefined, allowed: readonly string[]) {
+  return Boolean(user?.role && allowed.includes(user.role));
+}
 export function DataUploadCenterPage({ scope = "all", onNavigate, onLogout, user }: DataUploadCenterPageProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [currentBatch, setCurrentBatch] = useState<ImportBatchPreviewResponse | null>(null);
@@ -252,6 +255,12 @@ export function DataUploadCenterPage({ scope = "all", onNavigate, onLogout, user
   }
 
   async function handleUpload(file: File) {
+    if (!canUpload) {
+      setMessage("Upload permission denied for your current role.");
+      setMessageTone("danger");
+      return;
+    }
+
     if (!file.name.toLowerCase().endsWith(".xlsx")) {
       setMessage("Only .xlsx files are supported.");
       setMessageTone("danger");
@@ -279,6 +288,12 @@ export function DataUploadCenterPage({ scope = "all", onNavigate, onLogout, user
   }
 
   async function handleApprove() {
+    if (!canApprove) {
+      setMessage("Approval permission denied for your current role.");
+      setMessageTone("danger");
+      return;
+    }
+
     if (!currentBatch?.canApprove) return;
     setApproving(true);
     setMessage("");
@@ -304,6 +319,15 @@ export function DataUploadCenterPage({ scope = "all", onNavigate, onLogout, user
       setActiveSectionKey("");
       setMessage("Cleared current upload.");
       setMessageTone("info");
+      return;
+    }
+
+    if (!canCancel) {
+      setMessage("Cleared current preview. Cancelling staged imports is restricted to administrators.");
+      setMessageTone("info");
+      setCurrentBatch(null);
+      setActiveSectionKey("");
+      setSelectedFile(null);
       return;
     }
 
@@ -337,6 +361,9 @@ export function DataUploadCenterPage({ scope = "all", onNavigate, onLogout, user
   const counts = currentBatch?.counts ?? { rowCount: 0, validRowCount: 0, warningCount: 0, errorCount: 0 };
   const previewSource = currentBatch?.batch ?? null;
   const historyTitle = scope === "esg" ? "ESG History" : "Import History";
+  const canUpload = hasUploadRole(user, ["ADMIN", "HSE_MANAGER", "HSE_OFFICER"]);
+  const canApprove = hasUploadRole(user, ["ADMIN", "HSE_MANAGER"]);
+  const canCancel = hasUploadRole(user, ["ADMIN"]);
 
   return (
     <section className="data-upload-page">
@@ -410,11 +437,11 @@ export function DataUploadCenterPage({ scope = "all", onNavigate, onLogout, user
               <strong>Drop an Excel workbook here</strong>
               <span>Select or drag a `.xlsx` file. The upload is scanned before any database write happens.</span>
               <div className="data-upload-drop-actions">
-                <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                  {uploading ? "Scanning..." : "Browse workbook"}
+                <button type="button" onClick={() => fileInputRef.current?.click()} disabled={!canUpload || uploading}>
+                  {canUpload ? (uploading ? "Scanning..." : "Browse workbook") : "Upload restricted"}
                 </button>
                 <button type="button" className="secondary" onClick={handleCancel} disabled={canceling}>
-                  {currentBatch ? "Cancel upload" : "Clear selection"}
+                  {currentBatch ? (canCancel ? "Cancel upload" : "Clear view") : "Clear selection"}
                 </button>
               </div>
               {selectedFile && (
@@ -582,15 +609,15 @@ export function DataUploadCenterPage({ scope = "all", onNavigate, onLogout, user
             <div className="data-upload-actions-block">
               <button type="button" className="secondary" onClick={handleCancel} disabled={canceling}>
                 <Icon kind="cancel" />
-                <span>{currentBatch ? "Cancel" : "Reset"}</span>
+                <span>{currentBatch ? (canCancel ? "Cancel" : "Clear view") : "Reset"}</span>
               </button>
               <button type="button" className="secondary" onClick={() => selectedFile && void handleUpload(selectedFile)} disabled={!selectedFile || uploading}>
                 <Icon kind="refresh" />
                 <span>Re-scan</span>
               </button>
-              <button type="button" onClick={() => void handleApprove()} disabled={!currentBatch?.canApprove || approving}>
+              <button type="button" onClick={() => void handleApprove()} disabled={!canApprove || !currentBatch?.canApprove || approving}>
                 <Icon kind="check" />
-                <span>{approving ? "Approving..." : "Approve & Import"}</span>
+                <span>{canApprove ? (approving ? "Approving..." : "Approve & Import") : "Approval restricted"}</span>
               </button>
             </div>
 
@@ -664,4 +691,6 @@ export function DataUploadCenterPage({ scope = "all", onNavigate, onLogout, user
       </section>
   );
 }
+
+
 
