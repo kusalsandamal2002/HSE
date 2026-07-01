@@ -5620,3 +5620,35 @@ textarea {
   accent-color: #22d3ee;
   box-shadow: none !important;
 }
+
+/* Dark dropdown option contrast for Electron/Chrome */
+select option {
+  background: #07111f !important;
+  color: #e2e8f0 !important;
+}
+
+select option:checked,
+select option:hover {
+  background: #0891b2 !important;
+  color: #ffffff !important;
+}
+
+select:focus {
+  border-color: #22d3ee !important;
+}
+/* Dark dropdown option contrast for Electron/Chrome */
+select option {
+  background: #07111f !important;
+  color: #e2e8f0 !important;
+}
+
+select option:checked,
+select option:hover {
+  background: #0891b2 !important;
+  color: #ffffff !important;
+}
+
+select:focus {
+  border-color: #22d3ee !important;
+}
+
