@@ -4,6 +4,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { ADMIN_ONLY_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { prisma } from "../../lib/prisma.js";
+import { writeAuditLog } from "../../utils/audit.js";
 
 export const usersRouter = Router();
 
@@ -49,12 +50,78 @@ function actorId(req: { user?: { id?: string } }) {
   return req.user?.id;
 }
 
-function handlePrismaError(error: unknown, res: import("express").Response, next: import("express").NextFunction) {
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-    return res.status(409).json({ message: "Email already exists" });
+function userAuditPayload(user: {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    isActive: user.isActive,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+}
+
+async function assertAdminAccountSafety(params: {
+  targetUserId: string;
+  actorUserId?: string;
+  currentRole: UserRole;
+  currentIsActive: boolean;
+  nextRole?: UserRole;
+  nextIsActive?: boolean;
+}) {
+  const nextRole = params.nextRole ?? params.currentRole;
+  const nextIsActive = params.nextIsActive ?? params.currentIsActive;
+
+  const isAdminNow = params.currentRole === UserRole.ADMIN;
+  const willRemainActiveAdmin = nextRole === UserRole.ADMIN && nextIsActive === true;
+
+  if (params.actorUserId === params.targetUserId && !willRemainActiveAdmin) {
+    throw new Error("You cannot remove admin access from your own account");
   }
 
-  return next(error);
+  if (isAdminNow && params.currentIsActive && !willRemainActiveAdmin) {
+    const activeAdminCount = await prisma.user.count({
+      where: {
+        role: UserRole.ADMIN,
+        isActive: true,
+      },
+    });
+
+    if (activeAdminCount <= 1) {
+      throw new Error("At least one active ADMIN account must remain in the system");
+    }
+  }
+}
+
+function handlePrismaError(error: unknown, res: import("express").Response, next: import("express").NextFunction) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    res.status(409).json({ message: "Email already exists" });
+    return;
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+    res.status(404).json({ message: "User not found" });
+    return;
+  }
+
+  if (error instanceof Error && (
+    error.message.includes("At least one active ADMIN") ||
+    error.message.includes("own account")
+  )) {
+    res.status(400).json({ message: error.message });
+    return;
+  }
+
+  next(error);
 }
 
 usersRouter.use(requireAuth);
@@ -121,6 +188,14 @@ usersRouter.post("/", async (req, res, next) => {
       select: userSelect,
     });
 
+    await writeAuditLog({
+      user: req.user,
+      action: "CREATE_USER",
+      entity: "User",
+      entityId: user.id,
+      after: userAuditPayload(user),
+    });
+
     res.status(201).json({ user });
   } catch (error) {
     handlePrismaError(error, res, next);
@@ -132,14 +207,33 @@ usersRouter.put("/:id", async (req, res, next) => {
     const id = z.string().uuid().parse(req.params.id);
     const body = updateUserSchema.parse(req.body);
 
-    if (actorId(req) === id && body.isActive === false) {
-      return res.status(400).json({ message: "You cannot deactivate your own admin account" });
-    }
+    const before = await prisma.user.findUniqueOrThrow({
+      where: { id },
+      select: userSelect,
+    });
+
+    await assertAdminAccountSafety({
+      targetUserId: id,
+      actorUserId: actorId(req),
+      currentRole: before.role,
+      currentIsActive: before.isActive,
+      nextRole: body.role,
+      nextIsActive: body.isActive,
+    });
 
     const user = await prisma.user.update({
       where: { id },
       data: body,
       select: userSelect,
+    });
+
+    await writeAuditLog({
+      user: req.user,
+      action: "UPDATE_USER",
+      entity: "User",
+      entityId: user.id,
+      before: userAuditPayload(before),
+      after: userAuditPayload(user),
     });
 
     res.json({ user });
@@ -154,14 +248,32 @@ usersRouter.post("/:id/reset-password", async (req, res, next) => {
     const body = resetPasswordSchema.parse(req.body);
     const passwordHash = await bcrypt.hash(body.password, 10);
 
+    const before = await prisma.user.findUniqueOrThrow({
+      where: { id },
+      select: userSelect,
+    });
+
     await prisma.user.update({
       where: { id },
       data: { passwordHash },
       select: { id: true },
     });
 
+    await writeAuditLog({
+      user: req.user,
+      action: "RESET_USER_PASSWORD",
+      entity: "User",
+      entityId: id,
+      before: userAuditPayload(before),
+      after: {
+        id,
+        email: before.email,
+        passwordReset: true,
+      },
+    });
+
     res.json({ message: "Password reset successfully" });
   } catch (error) {
-    next(error);
+    handlePrismaError(error, res, next);
   }
 });
