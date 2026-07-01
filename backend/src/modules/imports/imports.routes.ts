@@ -1,11 +1,17 @@
-import fs from "node:fs";
-import path from "node:path";
 import { Router } from "express";
 import multer from "multer";
 import { env } from "../../config/env.js";
 import { ADMIN_ONLY_ROLES, IMPORT_APPROVE_ROLES, IMPORT_UPLOAD_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { HttpError, toNumber, toStringValue } from "../../utils/http.js";
 import { writeAuditLog } from "../../utils/audit.js";
+import {
+  EXCEL_IMPORT_POLICY,
+  MAX_IMPORT_FILE_SIZE_BYTES,
+  createMulterFileFilter,
+  createSafeStoredName,
+  ensureUploadDir,
+  safeOriginalName,
+} from "../../utils/upload-security.js";
 import {
   approveImportBatch,
   cancelImportBatch,
@@ -16,31 +22,26 @@ import {
 
 export const importsRouter = Router();
 
-const uploadDir = path.resolve(process.cwd(), env.uploadDir, "imports");
-fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = ensureUploadDir(env.uploadDir, "imports");
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, uploadDir),
   filename: (_req, file, cb) => {
-    const safeName = file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-    cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`);
+    try {
+      cb(null, createSafeStoredName(file, EXCEL_IMPORT_POLICY));
+    } catch (error) {
+      cb(error instanceof Error ? error : new HttpError(400, "Invalid Excel import file."), "");
+    }
   },
 });
 
 const upload = multer({
   storage,
-  limits: { fileSize: 25 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    const isXlsx = file.originalname.toLowerCase().endsWith(".xlsx");
-    const mimeOk =
-      file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-      file.mimetype === "application/octet-stream";
-    if (!isXlsx || !mimeOk) {
-      (cb as unknown as (error: Error | null, acceptFile: boolean) => void)(new HttpError(400, "Only .xlsx files are supported"), false);
-      return;
-    }
-    cb(null, true);
+  limits: {
+    fileSize: MAX_IMPORT_FILE_SIZE_BYTES,
+    files: 1,
   },
+  fileFilter: createMulterFileFilter(EXCEL_IMPORT_POLICY),
 });
 
 importsRouter.use(requireAuth);
@@ -64,7 +65,7 @@ importsRouter.post("/upload", requireRole(IMPORT_UPLOAD_ROLES), upload.single("f
         confidence: result.confidence,
         counts: result.counts,
         file: {
-          originalName: req.file.originalname,
+          originalName: safeOriginalName(req.file.originalname),
           filename: req.file.filename,
           mimetype: req.file.mimetype,
           size: req.file.size,
@@ -140,4 +141,3 @@ importsRouter.delete("/:batchId", requireRole(ADMIN_ONLY_ROLES), async (req, res
     next(error);
   }
 });
-
