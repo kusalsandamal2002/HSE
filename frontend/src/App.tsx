@@ -20,7 +20,8 @@ const EsgReportsPage = lazy(() => import("./pages/EsgModule").then((m) => ({ def
 const DataUploadCenterPage = lazy(() => import("./pages/DataUploadCenterPage").then((m) => ({ default: m.DataUploadCenterPage })));
 const DataEntryCenterPage = lazy(() => import("./pages/DataEntryCenterPage").then((m) => ({ default: m.DataEntryCenterPage })));
 const DataEntryTablePage = lazy(() => import("./pages/DataEntryTablePage").then((m) => ({ default: m.DataEntryTablePage })));
-const DataQualityCenterPage = lazy(() => import("./pages/DataQualityCenterPage").then((m) => ({ default: m.DataQualityCenterPage }))); 
+const DataQualityCenterPage = lazy(() => import("./pages/DataQualityCenterPage").then((m) => ({ default: m.DataQualityCenterPage })));
+const AuditTrailPage = lazy(() => import("./pages/AuditTrailPage").then((m) => ({ default: m.AuditTrailPage }))); 
 
 function PageLoading({ label = "Loading module..." }: { label?: string }) {
   return (
@@ -49,6 +50,7 @@ const organizationPages = [
 
 const reportingPages = [
   { key: "reports", path: "/reports", label: "Reports & Downloads" },
+  { key: "audit-logs", path: "/audit-logs", label: "Audit Trail" },
 ] as const;
 
 const displayPages = [
@@ -143,6 +145,8 @@ function canAccessPage(role: AccessRole | undefined, page: PageKey) {
   const fullAccess = ["ADMIN", "HSE_MANAGER"];
   const dashboardViewers = ["ADMIN", "HSE_MANAGER", "HSE_OFFICER", "DEPARTMENT_HEAD", "MANAGEMENT_VIEWER"];
   const operationalUsers = ["ADMIN", "HSE_MANAGER", "HSE_OFFICER"];
+
+  if (page === "audit-logs") return roleIn(role, ["ADMIN"]);
 
   if (roleIn(role, fullAccess)) return true;
 
@@ -401,6 +405,7 @@ export function App() {
 
       case "company": return <CompanyProfilePage />;
       case "reports": return <ReportsPage user={user} />;
+      case "audit-logs": return <AuditTrailPage />;
       case "tv": return <TvControlPage />;
 
       /* Hidden legacy routes still work if opened directly */
@@ -484,7 +489,7 @@ export function App() {
             </div>
           </header>
         )}
-        <Suspense fallback={<PageLoading />}>{renderPage()}</Suspense>
+        <Suspense fallback={<PageLoading />}>{canAccessPage(user.role, page) ? renderPage() : <AccessDeniedPage role={user.role} pageLabel={getPageLabel(page)} onNavigate={navigate} />}</Suspense>
         {showPasswordModal && (
           <ChangePasswordModal
             onClose={() => setShowPasswordModal(false)}
@@ -495,6 +500,8 @@ export function App() {
     </div>
   );
 }
+
+
 
 
 
