@@ -5,6 +5,7 @@ import multer from "multer";
 import { env } from "../../config/env.js";
 import { ADMIN_ONLY_ROLES, IMPORT_APPROVE_ROLES, IMPORT_UPLOAD_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { HttpError, toNumber, toStringValue } from "../../utils/http.js";
+import { writeAuditLog } from "../../utils/audit.js";
 import {
   approveImportBatch,
   cancelImportBatch,
@@ -49,7 +50,29 @@ importsRouter.post("/upload", requireRole(IMPORT_UPLOAD_ROLES), upload.single("f
     if (!req.file) {
       throw new HttpError(400, "Excel file is required");
     }
-    res.json(await uploadImportBatch(req.file, req.user?.name ?? req.user?.email ?? null));
+
+    const result = await uploadImportBatch(req.file, req.user?.name ?? req.user?.email ?? null);
+
+    await writeAuditLog({
+      user: req.user,
+      action: "UPLOAD_IMPORT_BATCH",
+      entity: "ImportBatch",
+      entityId: result.batch.id,
+      after: {
+        batch: result.batch,
+        workbookType: result.workbookType,
+        confidence: result.confidence,
+        counts: result.counts,
+        file: {
+          originalName: req.file.originalname,
+          filename: req.file.filename,
+          mimetype: req.file.mimetype,
+          size: req.file.size,
+        },
+      },
+    });
+
+    res.json(result);
   } catch (error) {
     next(error);
   }
@@ -75,7 +98,24 @@ importsRouter.get("/:batchId/preview", async (req, res, next) => {
 
 importsRouter.post("/:batchId/approve", requireRole(IMPORT_APPROVE_ROLES), async (req, res, next) => {
   try {
-    res.json(await approveImportBatch(req.params.batchId, req.user?.name ?? req.user?.email ?? null));
+    const before = await getImportBatchPreview(req.params.batchId);
+    const result = await approveImportBatch(req.params.batchId, req.user?.name ?? req.user?.email ?? null);
+
+    await writeAuditLog({
+      user: req.user,
+      action: "APPROVE_IMPORT_BATCH",
+      entity: "ImportBatch",
+      entityId: result.batch.id,
+      before: before.batch,
+      after: {
+        batch: result.batch,
+        workbookType: result.workbookType,
+        counts: result.counts,
+        importResult: "importResult" in result ? result.importResult : null,
+      },
+    });
+
+    res.json(result);
   } catch (error) {
     next(error);
   }
@@ -83,8 +123,21 @@ importsRouter.post("/:batchId/approve", requireRole(IMPORT_APPROVE_ROLES), async
 
 importsRouter.delete("/:batchId", requireRole(ADMIN_ONLY_ROLES), async (req, res, next) => {
   try {
-    res.json(await cancelImportBatch(req.params.batchId));
+    const before = await getImportBatchPreview(req.params.batchId);
+    const result = await cancelImportBatch(req.params.batchId);
+
+    await writeAuditLog({
+      user: req.user,
+      action: "DELETE_IMPORT_BATCH",
+      entity: "ImportBatch",
+      entityId: req.params.batchId,
+      before: before.batch,
+      after: result,
+    });
+
+    res.json(result);
   } catch (error) {
     next(error);
   }
 });
+
