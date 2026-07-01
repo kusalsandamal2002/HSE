@@ -499,16 +499,28 @@ function severityForIncidentType(incidentType: string) {
 }
 
 function resolveWorkbookPath() {
+  const explicit =
+    process.env.IMPORT_WORKBOOK_PATH?.trim() ||
+    process.env.HSE_IMPORT_WORKBOOK?.trim() ||
+    process.env.MAY_EXCEL_WORKBOOK?.trim();
+
   const candidates = [
+    explicit,
     path.resolve(backendDir, "..", "data", "Accident Summary - May.xlsx"),
+    path.resolve(backendDir, "..", "data", "Accident Summary - May (1).xlsx"),
     path.resolve(backendDir, "..", "deta", "Accident Summary - May.xlsx"),
-  ];
+    path.resolve(backendDir, "..", "deta", "Accident Summary - May (1).xlsx"),
+  ].filter((candidate): candidate is string => Boolean(candidate));
 
   const found = candidates.find((candidate) => fs.existsSync(candidate));
   if (!found) {
     throw new Error(
       `Workbook not found. Checked:\n${candidates.map((candidate) => `- ${candidate}`).join("\n")}`,
     );
+  }
+
+  if (explicit && path.resolve(found) === path.resolve(explicit)) {
+    addWarning(`Using workbook path from environment: "${found}".`);
   }
 
   if (found.includes(`${path.sep}deta${path.sep}`)) {
