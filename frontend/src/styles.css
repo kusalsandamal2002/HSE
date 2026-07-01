@@ -5651,4 +5651,151 @@ select option:hover {
 select:focus {
   border-color: #22d3ee !important;
 }
+/* Dashboard fullscreen professional header action patch START */
+
+/*
+  Places the fullscreen control as a professional inline action inside the
+  dashboard heading/action card instead of floating over the title/user area.
+  Applies consistently to Executive, HSE Master, and ESG Master dashboard headers.
+*/
+
+.dashboard-page button[title*="fullscreen" i],
+.dashboard-page button[aria-label*="fullscreen" i],
+.master-dashboard-page button[title*="fullscreen" i],
+.master-dashboard-page button[aria-label*="fullscreen" i],
+.esg-page button[title*="fullscreen" i],
+.esg-page button[aria-label*="fullscreen" i],
+.executive-dashboard-page button[title*="fullscreen" i],
+.executive-dashboard-page button[aria-label*="fullscreen" i],
+button.fullscreen-button,
+button.fullscreen-toggle,
+.fullscreen-button,
+.fullscreen-toggle {
+  position: static !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+  z-index: 1 !important;
+
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  padding: 0 !important;
+  margin: 0 8px 0 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 14px !important;
+  border: 1px solid rgba(34, 211, 238, 0.45) !important;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(34, 211, 238, 0.22), transparent 45%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(8, 47, 73, 0.82)) !important;
+  color: #e0faff !important;
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.08),
+    0 12px 26px rgba(0, 0, 0, 0.24) !important;
+  backdrop-filter: blur(12px);
+}
+
+.dashboard-page button[title*="fullscreen" i]:hover,
+.dashboard-page button[aria-label*="fullscreen" i]:hover,
+.master-dashboard-page button[title*="fullscreen" i]:hover,
+.master-dashboard-page button[aria-label*="fullscreen" i]:hover,
+.esg-page button[title*="fullscreen" i]:hover,
+.esg-page button[aria-label*="fullscreen" i]:hover,
+.executive-dashboard-page button[title*="fullscreen" i]:hover,
+.executive-dashboard-page button[aria-label*="fullscreen" i]:hover,
+button.fullscreen-button:hover,
+button.fullscreen-toggle:hover,
+.fullscreen-button:hover,
+.fullscreen-toggle:hover {
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(34, 211, 238, 0.32), transparent 46%),
+    linear-gradient(135deg, rgba(8, 145, 178, 0.96), rgba(14, 116, 144, 0.9)) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.16),
+    0 16px 34px rgba(8, 145, 178, 0.24) !important;
+}
+
+/* Make common page heading cards/action areas align cleanly */
+.dashboard-hero,
+.master-dashboard-hero,
+.executive-hero,
+.esg-hero,
+.page-hero,
+.data-entry-hero {
+  position: relative !important;
+}
+
+.dashboard-hero > div:last-child,
+.master-dashboard-hero > div:last-child,
+.executive-hero > div:last-child,
+.esg-hero > div:last-child,
+.page-hero > div:last-child,
+.data-entry-hero > div:last-child,
+.header-actions,
+.topbar-actions,
+.user-actions,
+.page-hero-actions,
+.dashboard-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+/* Prevent the fullscreen control from covering the user name/role */
+.dashboard-hero .user-chip,
+.master-dashboard-hero .user-chip,
+.executive-hero .user-chip,
+.esg-hero .user-chip,
+.page-hero .user-chip,
+.topbar-user,
+.current-user,
+.user-menu,
+.user-badge {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Keep action buttons inside header card on smaller screens */
+@media (max-width: 900px) {
+  .dashboard-page button[title*="fullscreen" i],
+  .dashboard-page button[aria-label*="fullscreen" i],
+  .master-dashboard-page button[title*="fullscreen" i],
+  .master-dashboard-page button[aria-label*="fullscreen" i],
+  .esg-page button[title*="fullscreen" i],
+  .esg-page button[aria-label*="fullscreen" i],
+  .executive-dashboard-page button[title*="fullscreen" i],
+  .executive-dashboard-page button[aria-label*="fullscreen" i],
+  button.fullscreen-button,
+  button.fullscreen-toggle,
+  .fullscreen-button,
+  .fullscreen-toggle {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 12px !important;
+  }
+
+  .dashboard-hero > div:last-child,
+  .master-dashboard-hero > div:last-child,
+  .executive-hero > div:last-child,
+  .esg-hero > div:last-child,
+  .page-hero > div:last-child,
+  .data-entry-hero > div:last-child {
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+}
+
+/* Dashboard fullscreen professional header action patch END */
 
