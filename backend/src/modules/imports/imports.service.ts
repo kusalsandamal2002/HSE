@@ -32,7 +32,7 @@ function sha256(filePath: string) {
   return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
-function sanitizeJsonValue(value: unknown): Prisma.InputJsonValue {
+function sanitizeJsonValue(value: unknown): unknown {
   if (value === undefined) return null;
   if (value === null) return null;
 
@@ -41,15 +41,15 @@ function sanitizeJsonValue(value: unknown): Prisma.InputJsonValue {
   }
 
   if (Array.isArray(value)) {
-    return value.map((item) => sanitizeJsonValue(item)) as Prisma.InputJsonArray;
+    return value.map((item) => sanitizeJsonValue(item));
   }
 
   if (typeof value === "object") {
-    const output: Record<string, Prisma.InputJsonValue> = {};
+    const output: Record<string, unknown> = {};
     for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
       output[key] = sanitizeJsonValue(item);
     }
-    return output as Prisma.InputJsonObject;
+    return output;
   }
 
   if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") {
@@ -59,16 +59,19 @@ function sanitizeJsonValue(value: unknown): Prisma.InputJsonValue {
   return String(value);
 }
 
+function toInputJsonValue(value: unknown): Prisma.InputJsonValue {
+  return sanitizeJsonValue(value) as Prisma.InputJsonValue;
+}
+
 function toIssueRecord(issue: ImportIssue) {
   return {
     sectionKey: issue.sectionKey,
     severity: issue.severity,
     code: issue.code,
     message: issue.message,
-    detailsJson: issue.details ? sanitizeJsonValue(issue.details) : undefined,
+    detailsJson: issue.details ? toInputJsonValue(issue.details) : undefined,
   };
 }
-
 function buildSummary(inspection: WorkbookInspection, fileHash: string, duplicateBatchId?: string | null) {
   return {
     ...inspection.summary,
@@ -217,7 +220,7 @@ async function createStoredBatch(
       validRowCount: params.inspection.validRowCount,
       warningCount: params.inspection.warningCount,
       errorCount: params.inspection.errorCount + (duplicateIssue ? 1 : 0),
-      summaryJson: buildSummary(params.inspection, params.fileHash, params.duplicateBatchId) as Prisma.InputJsonValue,
+      summaryJson: toInputJsonValue(buildSummary(params.inspection, params.fileHash, params.duplicateBatchId)),
       file: {
         create: {
           originalName: params.file.originalname,
@@ -236,7 +239,7 @@ async function createStoredBatch(
           confidence: section.confidence,
           rowCount: section.rowCount,
           summary: section.summary,
-          metadataJson: section.metadata ? sanitizeJsonValue(section.metadata) : undefined,
+          metadataJson: section.metadata ? toInputJsonValue(section.metadata) : undefined,
         })),
       },
       previewRows: {
@@ -244,10 +247,10 @@ async function createStoredBatch(
           section.rows.map((row) => ({
             sectionKey: row.sectionKey,
             rowIndex: row.rowIndex,
-            rawJson: sanitizeJsonValue(row.rawJson),
-            mappedJson: sanitizeJsonValue(row.mappedJson),
+            rawJson: toInputJsonValue(row.rawJson),
+            mappedJson: toInputJsonValue(row.mappedJson),
             status: row.status,
-            validationJson: row.validation.length ? sanitizeJsonValue(row.validation) : undefined,
+            validationJson: row.validation.length ? toInputJsonValue(row.validation) : undefined,
           })),
         ),
       },
@@ -460,6 +463,7 @@ export async function approveImportBatch(batchId: string, approvedBy: string | n
     return buildPreviewResponse(failed);
   }
 }
+
 
 
 
