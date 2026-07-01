@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../../lib/prisma.js";
 import { ADMIN_ONLY_ROLES, CONFIG_WRITE_ROLES, requireAuth, requireRole } from "../../middleware/auth.js";
 import { HttpError } from "../../utils/http.js";
+import { writeAuditLog } from "../../utils/audit.js";
 
 export const dataEntryRouter = Router();
 dataEntryRouter.use(requireAuth);
@@ -466,6 +467,15 @@ dataEntryRouter.post("/:tableKey", requireRole(CONFIG_WRITE_ROLES), async (req, 
     const model = getModel(config);
     const data = normalizeBody(req.body, config, true);
     const created = await model.create({ data });
+
+    await writeAuditLog({
+      user: req.user,
+      action: "DATA_ENTRY_CREATE",
+      entity: config.model,
+      entityId: created.id,
+      after: created,
+    });
+
     res.status(201).json(normalizeRow(created, config));
   } catch (error) { next(error); }
 });
@@ -475,7 +485,18 @@ dataEntryRouter.put("/:tableKey/:id", requireRole(CONFIG_WRITE_ROLES), async (re
     const config = getConfig(req.params.tableKey);
     const model = getModel(config);
     const data = normalizeBody(req.body, config, false);
+    const before = await model.findUnique({ where: { id: req.params.id } });
     const updated = await model.update({ where: { id: req.params.id }, data });
+
+    await writeAuditLog({
+      user: req.user,
+      action: "DATA_ENTRY_UPDATE",
+      entity: config.model,
+      entityId: updated.id,
+      before,
+      after: updated,
+    });
+
     res.json(normalizeRow(updated, config));
   } catch (error) { next(error); }
 });
@@ -484,21 +505,53 @@ dataEntryRouter.delete("/:tableKey/:id", requireRole(ADMIN_ONLY_ROLES), async (r
   try {
     const config = getConfig(req.params.tableKey);
     const model = getModel(config);
+    const before = await model.findUnique({ where: { id: req.params.id } });
 
     if (config.deleteMode === "soft-delete") {
       const deleted = await model.update({ where: { id: req.params.id }, data: { isDeleted: true } });
+
+      await writeAuditLog({
+        user: req.user,
+        action: "DATA_ENTRY_DELETE",
+        entity: config.model,
+        entityId: deleted.id,
+        before,
+        after: deleted,
+      });
+
       return res.json(normalizeRow(deleted, config));
     }
 
     if (config.deleteMode === "deactivate") {
       const deleted = await model.update({ where: { id: req.params.id }, data: { isActive: false } });
+
+      await writeAuditLog({
+        user: req.user,
+        action: "DATA_ENTRY_DELETE",
+        entity: config.model,
+        entityId: deleted.id,
+        before,
+        after: deleted,
+      });
+
       return res.json(normalizeRow(deleted, config));
     }
 
     const deleted = await model.delete({ where: { id: req.params.id } });
+
+    await writeAuditLog({
+      user: req.user,
+      action: "DATA_ENTRY_DELETE",
+      entity: config.model,
+      entityId: deleted.id,
+      before,
+      after: deleted,
+    });
+
     res.json(normalizeRow(deleted, config));
   } catch (error) { next(error); }
 });
+
 
 
 
