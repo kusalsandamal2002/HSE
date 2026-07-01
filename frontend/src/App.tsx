@@ -47,6 +47,7 @@ const dataCenterPages = [
 
 const organizationPages = [
   { key: "company", path: "/company-profile", label: "Company Profile" },
+  { key: "users", path: "/users", label: "User Management" },
 ] as const;
 
 const reportingPages = [
@@ -91,7 +92,8 @@ const allPages = [
   ...hiddenLegacyPages,
 ] as const;
 
-type PageKey = typeof allPages[number]["key"];
+type PageKey = typeof allPages[number]["key"]
+  | "users";
 
 const pageByPath = new Map<string, PageKey>();
 for (const item of allPages) {
@@ -101,7 +103,8 @@ for (const item of allPages) {
 
 function resolvePage(pathname: string): PageKey {
   const slug = pathname.replace(/^\/+/, "");
-  if (slug === "data-entry" || slug.startsWith("data-entry/")) return "data-entry";
+    if (slug === "users") return "users";
+if (slug === "data-entry" || slug.startsWith("data-entry/")) return "data-entry";
   return pageByPath.get(slug) ?? "dashboard";
 }
 
@@ -502,6 +505,7 @@ export function App() {
     </div>
   );
 }
+
 
 
 
