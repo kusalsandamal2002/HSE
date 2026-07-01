@@ -70,6 +70,10 @@ function ensureButton() {
   return button;
 }
 
+function removeSidebarHost() {
+  document.querySelectorAll(`.${SIDEBAR_HOST_CLASS}`).forEach((host) => host.remove());
+}
+
 function ensureSidebarHost() {
   const sidebar = document.querySelector<HTMLElement>(".sidebar");
   if (!sidebar) return null;
@@ -85,13 +89,12 @@ function ensureSidebarHost() {
     `;
   }
 
-  const firstChild = sidebar.children.item(0);
-  const secondChild = sidebar.children.item(1);
+  const children = Array.from(sidebar.children);
+  const logoBlock = children[0] ?? null;
+  const insertBeforeNode = logoBlock?.nextElementSibling ?? children[1] ?? null;
 
-  if (firstChild && host.previousElementSibling !== firstChild) {
-    sidebar.insertBefore(host, secondChild);
-  } else if (!host.parentElement) {
-    sidebar.insertBefore(host, secondChild);
+  if (host.parentElement !== sidebar) {
+    sidebar.insertBefore(host, insertBeforeNode);
   }
 
   return host;
@@ -132,6 +135,7 @@ function mountButton() {
 
   if (!kind) {
     button.hidden = true;
+    removeSidebarHost();
     return;
   }
 
@@ -142,6 +146,7 @@ function mountButton() {
   resetButtonClasses(button);
 
   if (active) {
+    removeSidebarHost();
     button.classList.add("dashboard-fullscreen-floating");
     button.innerHTML = iconSvg(true, false);
 
@@ -153,6 +158,8 @@ function mountButton() {
   }
 
   if (kind === "executive") {
+    removeSidebarHost();
+
     button.classList.add("dashboard-fullscreen-compact");
     button.innerHTML = iconSvg(false, true);
 
@@ -165,6 +172,7 @@ function mountButton() {
 
   if (kind === "hse-master" || kind === "esg-master") {
     const host = ensureSidebarHost();
+
     button.classList.add("dashboard-fullscreen-sidebar");
     button.innerHTML = iconSvg(false, false);
 
