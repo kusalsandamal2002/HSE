@@ -1,15 +1,20 @@
 import { Router } from "express";
-import { requireAuth, requireRole } from "../../middleware/auth.js";
+import { z } from "zod";
+import { requireAuth } from "../../middleware/auth.js";
 import { getDataQualitySummary } from "./data-quality.service.js";
 
 export const dataQualityRouter = Router();
 
-dataQualityRouter.get("/monthly", requireAuth, requireRole(["ADMIN", "HSE_OFFICER"]), async (req, res, next) => {
+dataQualityRouter.use(requireAuth);
+
+dataQualityRouter.get("/monthly", async (req, res, next) => {
   try {
-    const year = Number(req.query.year || new Date().getFullYear());
-    const month = Number(req.query.month || (new Date().getMonth() + 1));
-    const summary = await getDataQualitySummary({ year, month });
-    res.json(summary);
+    const query = z.object({
+      year: z.coerce.number().int().min(2000).max(2100).default(new Date().getFullYear()),
+      month: z.coerce.number().int().min(1).max(12).default(new Date().getMonth() + 1),
+    }).parse(req.query);
+
+    res.json(await getDataQualitySummary(query));
   } catch (error) {
     next(error);
   }

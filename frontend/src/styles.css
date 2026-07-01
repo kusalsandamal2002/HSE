@@ -5484,3 +5484,118 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+.quality-hero-grid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.quality-score-card {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 20px;
+  padding: 22px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.92));
+  color: #f8fafc;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+}
+
+.quality-score-card span,
+.quality-score-card p {
+  color: rgba(226, 232, 240, 0.82);
+}
+
+.quality-score-card strong {
+  display: block;
+  margin: 10px 0;
+  font-size: clamp(2.2rem, 4vw, 4.2rem);
+  line-height: 1;
+}
+
+.quality-check-list {
+  display: grid;
+  gap: 12px;
+}
+
+.quality-check {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 18px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.quality-check h4 {
+  margin: 8px 0 6px;
+}
+
+.quality-check p {
+  margin: 0 0 6px;
+  color: #475569;
+}
+
+.quality-check small {
+  color: #64748b;
+}
+
+.quality-check strong {
+  font-size: 1.4rem;
+}
+
+.quality-check.quality-error {
+  border-color: rgba(220, 38, 38, 0.35);
+  background: rgba(254, 242, 242, 0.92);
+}
+
+.quality-check.quality-warning {
+  border-color: rgba(217, 119, 6, 0.35);
+  background: rgba(255, 251, 235, 0.92);
+}
+
+.quality-check.quality-info {
+  border-color: rgba(37, 99, 235, 0.25);
+  background: rgba(239, 246, 255, 0.92);
+}
+
+.quality-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.quality-pass {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.quality-info {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.quality-warning {
+  background: rgba(217, 119, 6, 0.14);
+  color: #b45309;
+}
+
+.quality-error {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+}
+
+@media (max-width: 900px) {
+  .quality-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quality-check {
+    flex-direction: column;
+  }
+}

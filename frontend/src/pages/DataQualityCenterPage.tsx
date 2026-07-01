@@ -12,12 +12,26 @@ type DataQualityMetric = {
 type DataQualityIssue = {
   metric: string;
   message: string;
+  severity: "INFO" | "WARNING" | "ERROR";
+  category: string;
+  action: string;
+};
+
+type DataQualityCheck = {
+  key: string;
+  label: string;
+  value: number;
+  status: "Passed" | "Warning" | "Failed" | "Info";
+  severity: "PASS" | "INFO" | "WARNING" | "ERROR";
+  description: string;
+  action: string;
 };
 
 type DataQualitySummary = {
   year: number;
   month: number;
   overallStatus: string;
+  healthScore: number;
   sourceTotals: {
     totalAccidents: number;
     firstAidCount: number;
@@ -38,8 +52,24 @@ type DataQualitySummary = {
   };
   departmentIncidentCounts: Array<{ department: string; count: number }>;
   kpis: DataQualityMetric[];
+  checks: DataQualityCheck[];
   issues: DataQualityIssue[];
 };
+
+const severityLabel = {
+  PASS: "Passed",
+  INFO: "Info",
+  WARNING: "Warning",
+  ERROR: "Critical",
+};
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(value);
+}
+
+function pillClass(severity: DataQualityCheck["severity"] | DataQualityIssue["severity"]) {
+  return `quality-pill quality-${severity.toLowerCase()}`;
+}
 
 export function DataQualityCenterPage() {
   const now = new Date();
@@ -52,6 +82,7 @@ export function DataQualityCenterPage() {
   const loadSummary = async () => {
     setLoading(true);
     setError("");
+
     try {
       const result = await api<DataQualitySummary>(`/api/data-quality/monthly?year=${year}&month=${month}`);
       setSummary(result);
@@ -66,7 +97,14 @@ export function DataQualityCenterPage() {
     void loadSummary();
   }, [year, month]);
 
-  const metricCards = useMemo(() => summary?.kpis ?? [], [summary]);
+  const groupedChecks = useMemo(() => {
+    const priority = { ERROR: 0, WARNING: 1, INFO: 2, PASS: 3 };
+    return [...(summary?.checks ?? [])].sort((a, b) => priority[a.severity] - priority[b.severity]);
+  }, [summary]);
+
+  const criticalCount = summary?.checks.filter((item) => item.severity === "ERROR").length ?? 0;
+  const warningCount = summary?.checks.filter((item) => item.severity === "WARNING").length ?? 0;
+  const infoCount = summary?.checks.filter((item) => item.severity === "INFO").length ?? 0;
 
   return (
     <div className="data-entry-page">
@@ -74,7 +112,7 @@ export function DataQualityCenterPage() {
         <div>
           <p className="eyebrow">DATA QUALITY</p>
           <h2>Data Quality Center</h2>
-          <p>Compare source totals, database totals, and dashboard values for the selected month.</p>
+          <p>Monitor dashboard reliability, missing master-data links, open actions, import failures, and ESG/working-hour coverage.</p>
         </div>
         <div className="data-entry-search">
           <label>Year</label>
@@ -94,40 +132,44 @@ export function DataQualityCenterPage() {
       </section>
 
       {error ? <div className="data-entry-error">{error}</div> : null}
-
       {loading ? <div className="data-entry-loading">Loading quality report...</div> : null}
 
       {summary ? (
         <>
           <section className="data-entry-section">
-            <h3>Overall Status</h3>
-            <div className="data-entry-card-grid">
-              <div className="data-entry-card">
-                <span>Period</span>
-                <strong>{summary.year}-{String(summary.month).padStart(2, "0")}</strong>
+            <h3>Quality Health</h3>
+            <div className="quality-hero-grid">
+              <div className="quality-score-card">
+                <span>Health Score</span>
+                <strong>{summary.healthScore}%</strong>
                 <p>{summary.overallStatus}</p>
               </div>
               <div className="data-entry-card">
-                <span>Matched KPIs</span>
-                <strong>{summary.kpis.filter((item) => item.status === "Matched").length}</strong>
-                <p>of {summary.kpis.length}</p>
+                <span>Critical</span>
+                <strong>{criticalCount}</strong>
+                <p>must fix before final reports</p>
               </div>
               <div className="data-entry-card">
-                <span>Issues</span>
-                <strong>{summary.issues.length}</strong>
-                <p>mismatch entries</p>
+                <span>Warnings</span>
+                <strong>{warningCount}</strong>
+                <p>follow-up required</p>
+              </div>
+              <div className="data-entry-card">
+                <span>Info</span>
+                <strong>{infoCount}</strong>
+                <p>tracked items</p>
               </div>
             </div>
           </section>
 
           <section className="data-entry-section">
-            <h3>KPI Comparison</h3>
+            <h3>Monthly KPI Snapshot</h3>
             <div className="data-entry-card-grid">
-              {metricCards.map((metric) => (
+              {summary.kpis.map((metric) => (
                 <div key={metric.key} className="data-entry-card">
                   <span>{metric.label}</span>
-                  <strong>Expected: {metric.expectedValue}</strong>
-                  <p>Database: {metric.databaseValue}</p>
+                  <strong>{formatNumber(metric.databaseValue)}</strong>
+                  <p>Period: {summary.year}-{String(summary.month).padStart(2, "0")}</p>
                   <small>Status: {metric.status}</small>
                 </div>
               ))}
@@ -135,47 +177,72 @@ export function DataQualityCenterPage() {
           </section>
 
           <section className="data-entry-section">
-            <h3>Issue Detail</h3>
+            <h3>Quality Checks</h3>
+            <div className="quality-check-list">
+              {groupedChecks.map((item) => (
+                <article key={item.key} className={`quality-check quality-${item.severity.toLowerCase()}`}>
+                  <div>
+                    <span className={pillClass(item.severity)}>{severityLabel[item.severity]}</span>
+                    <h4>{item.label}</h4>
+                    <p>{item.description}</p>
+                    <small>{item.action}</small>
+                  </div>
+                  <strong>{formatNumber(item.value)}</strong>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="data-entry-section">
+            <h3>Issue Details</h3>
             {summary.issues.length ? (
               <table className="dashboard-table">
                 <thead>
                   <tr>
+                    <th>Severity</th>
                     <th>Metric</th>
                     <th>Issue</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {summary.issues.map((issue) => (
-                    <tr key={issue.metric}>
+                    <tr key={`${issue.severity}-${issue.metric}`}>
+                      <td><span className={pillClass(issue.severity)}>{issue.severity}</span></td>
                       <td>{issue.metric}</td>
                       <td>{issue.message}</td>
+                      <td>{issue.action}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             ) : (
-              <p>No mismatches detected.</p>
+              <p>No data quality issues detected.</p>
             )}
           </section>
 
           <section className="data-entry-section">
             <h3>Department Breakdown</h3>
-            <table className="dashboard-table">
-              <thead>
-                <tr>
-                  <th>Department</th>
-                  <th>Incident Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                {summary.departmentIncidentCounts.map((row) => (
-                  <tr key={row.department}>
-                    <td>{row.department}</td>
-                    <td>{row.count}</td>
+            {summary.departmentIncidentCounts.length ? (
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Department</th>
+                    <th>Incident Count</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {summary.departmentIncidentCounts.map((row) => (
+                    <tr key={row.department}>
+                      <td>{row.department}</td>
+                      <td>{row.count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No incidents recorded for the selected month.</p>
+            )}
           </section>
         </>
       ) : null}
