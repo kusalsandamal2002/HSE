@@ -41,7 +41,7 @@ function sanitizeJsonValue(value: unknown): unknown {
   }
 
   if (Array.isArray(value)) {
-    return value.map((item) => sanitizeJsonValue(item));
+    return Array.from({ length: value.length }, (_item, index) => sanitizeJsonValue(value[index]));
   }
 
   if (typeof value === "object") {
@@ -323,12 +323,12 @@ export async function uploadImportBatch(file: UploadedFile, uploadedBy: string |
         validRowCount: 0,
         warningCount: 0,
         errorCount: 1,
-        summaryJson: {
+        summaryJson: toInputJsonValue({
           workbookType: "UNKNOWN",
           sourceFile: file.originalname,
           error: error instanceof Error ? error.message : String(error),
           fileHash,
-        } as Prisma.InputJsonValue,
+        }),
         file: {
           create: {
             originalName: file.originalname,
@@ -346,9 +346,9 @@ export async function uploadImportBatch(file: UploadedFile, uploadedBy: string |
               severity: "ERROR",
               code: "parse_failed",
               message: error instanceof Error ? error.message : String(error),
-              detailsJson: {
+              detailsJson: toInputJsonValue({
                 originalName: file.originalname,
-              },
+              }),
             },
           ],
         },
@@ -437,10 +437,10 @@ export async function approveImportBatch(batchId: string, approvedBy: string | n
         status: "FAILED",
         approvedBy,
         approvedAt: new Date(),
-        summaryJson: {
+        summaryJson: toInputJsonValue({
           ...(batch.summaryJson as Record<string, unknown>),
           approvalError: error instanceof Error ? error.message : String(error),
-        },
+        }),
       },
       include: {
         file: true,
@@ -463,6 +463,7 @@ export async function approveImportBatch(batchId: string, approvedBy: string | n
     return buildPreviewResponse(failed);
   }
 }
+
 
 
 
