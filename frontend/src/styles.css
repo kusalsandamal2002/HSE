@@ -5651,4 +5651,104 @@ select option:hover {
 select:focus {
   border-color: #22d3ee !important;
 }
+/* Dashboard fullscreen clean component placement START */
+
+.dashboard-fullscreen-trigger {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 13px !important;
+  border: 1px solid rgba(34, 211, 238, 0.5) !important;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(34, 211, 238, 0.22), transparent 44%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(8, 47, 73, 0.9)) !important;
+  color: #e0faff !important;
+  font-size: 1.08rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.08),
+    0 12px 24px rgba(0, 0, 0, 0.24) !important;
+}
+
+.dashboard-fullscreen-trigger:hover {
+  border-color: rgba(34, 211, 238, 0.9) !important;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(34, 211, 238, 0.34), transparent 44%),
+    linear-gradient(135deg, rgba(8, 145, 178, 0.98), rgba(14, 116, 144, 0.92)) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.dashboard-fullscreen-inline-host {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.dashboard-fullscreen-inline-host > .dashboard-fullscreen-trigger {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  order: 99 !important;
+  z-index: 2 !important;
+}
+
+.dashboard-fullscreen-corner-host {
+  position: relative !important;
+  padding-right: 58px !important;
+}
+
+.dashboard-fullscreen-corner-host > .dashboard-fullscreen-trigger {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  z-index: 8 !important;
+}
+
+.hse-dashboard-fullscreen-active .sidebar {
+  display: none !important;
+}
+
+.hse-dashboard-fullscreen-active .main {
+  margin-left: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+}
+
+.hse-dashboard-fullscreen-active .master-main,
+.hse-dashboard-fullscreen-active .dashboard-page,
+.hse-dashboard-fullscreen-active .esg-page {
+  min-height: 100vh !important;
+}
+
+@media (max-width: 900px) {
+  .dashboard-fullscreen-trigger {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    border-radius: 11px !important;
+  }
+
+  .dashboard-fullscreen-corner-host {
+    padding-right: 50px !important;
+  }
+
+  .dashboard-fullscreen-corner-host > .dashboard-fullscreen-trigger {
+    top: 8px !important;
+    right: 8px !important;
+  }
+}
+
+/* Dashboard fullscreen clean component placement END */
 

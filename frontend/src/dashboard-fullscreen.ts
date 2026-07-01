@@ -1,121 +1,226 @@
-﻿type DashboardMode = "executive" | "master" | "esg";
-
 declare global {
   interface Window {
     __hseDashboardFullscreenInstalled?: boolean;
   }
 }
 
-const dashboardRoutes: Record<string, DashboardMode> = {
-  "/dashboard": "executive",
-  "/master-dashboard": "master",
-  "/esg-dashboard": "esg",
-};
+const STORAGE_KEY = "hse-dashboard-presentation-mode";
+const BUTTON_CLASS = "dashboard-fullscreen-trigger";
+const ACTIVE_CLASS = "hse-dashboard-fullscreen-active";
 
-function getDashboardMode(): DashboardMode | null {
-  const pathname = window.location.pathname.replace(/\/$/, "") || "/dashboard";
-  return dashboardRoutes[pathname] ?? null;
+function pageText() {
+  return document.body?.innerText?.toLowerCase() ?? "";
 }
 
-function removeOldExecutiveOverlay() {
-  document.querySelector(".executive-presentation-overlay")?.remove();
+function currentPath() {
+  return window.location.pathname.toLowerCase();
 }
 
-function setPresentationMode(active: boolean, button: HTMLButtonElement, browserFullscreen = true) {
-  const mode = getDashboardMode();
+function isDashboardPage() {
+  const path = currentPath();
+  const text = pageText();
 
-  removeOldExecutiveOverlay();
+  return (
+    path.includes("dashboard") ||
+    text.includes("executive dashboard") ||
+    text.includes("hse master dashboard") ||
+    text.includes("esg master dashboard")
+  );
+}
 
-  document.documentElement.classList.toggle("dashboard-presentation-mode", active);
-  document.body.classList.toggle("dashboard-presentation-mode", active);
+function isExecutiveDashboard() {
+  const text = pageText();
+  const path = currentPath();
 
-  if (mode) {
-    document.body.dataset.dashboardScreen = mode;
+  return path.includes("executive") || text.includes("executive dashboard");
+}
+
+function isHseMasterDashboard() {
+  const text = pageText();
+  const path = currentPath();
+
+  return path.includes("master") || text.includes("hse master dashboard");
+}
+
+function isEsgDashboard() {
+  const text = pageText();
+  const path = currentPath();
+
+  return path.includes("esg") || text.includes("esg master dashboard");
+}
+
+function presentationActive() {
+  return localStorage.getItem(STORAGE_KEY) === "1";
+}
+
+function applyPresentationMode(active: boolean) {
+  document.documentElement.classList.toggle(ACTIVE_CLASS, active);
+  document.body.classList.toggle(ACTIVE_CLASS, active);
+  localStorage.setItem(STORAGE_KEY, active ? "1" : "0");
+}
+
+async function toggleFullscreen() {
+  const next = !presentationActive();
+  applyPresentationMode(next);
+
+  try {
+    if (next && !document.fullscreenElement) {
+      await document.documentElement.requestFullscreen?.();
+    } else if (!next && document.fullscreenElement) {
+      await document.exitFullscreen?.();
+    }
+  } catch {
+    // CSS presentation mode still works when browser fullscreen is blocked.
   }
 
-  button.classList.toggle("is-active", active);
-  button.textContent = active ? "EXIT" : "⛶";
-  button.title = active ? "Exit presentation view" : "Open presentation view";
-  button.setAttribute("aria-label", active ? "Exit presentation view" : "Open presentation view");
+  syncButton();
+}
 
-  if (browserFullscreen && active) {
-    document.documentElement.requestFullscreen?.().catch(() => {
-      // CSS presentation mode still works if browser fullscreen is blocked.
-    });
-  } else if (browserFullscreen && !active && document.fullscreenElement) {
-    document.exitFullscreen?.().catch(() => {
-      // Ignore browser fullscreen exit restrictions.
-    });
+function ensureButton() {
+  let button = document.querySelector<HTMLButtonElement>(`.${BUTTON_CLASS}`);
+
+  if (!button) {
+    button = document.createElement("button");
+    button.type = "button";
+    button.className = BUTTON_CLASS;
+    button.title = "Toggle dashboard fullscreen";
+    button.setAttribute("aria-label", "Toggle dashboard fullscreen");
+    button.addEventListener("click", toggleFullscreen);
+    document.body.appendChild(button);
+  }
+
+  return button;
+}
+
+function findHeadingByText(words: string[]) {
+  const headings = Array.from(document.querySelectorAll<HTMLElement>("h1, h2, h3, strong, .master-title, .page-title"));
+
+  return headings.find((item) => {
+    const text = item.innerText?.toLowerCase() ?? "";
+    return words.every((word) => text.includes(word));
+  });
+}
+
+function useInlineHost(button: HTMLButtonElement, host: HTMLElement) {
+  host.classList.add("dashboard-fullscreen-inline-host");
+  host.classList.remove("dashboard-fullscreen-corner-host");
+
+  if (button.parentElement !== host) {
+    host.appendChild(button);
   }
 }
 
-function syncDashboardFullscreenButton(button: HTMLButtonElement) {
-  const mode = getDashboardMode();
+function useCornerHost(button: HTMLButtonElement, host: HTMLElement) {
+  host.classList.add("dashboard-fullscreen-corner-host");
+  host.classList.remove("dashboard-fullscreen-inline-host");
 
-  removeOldExecutiveOverlay();
+  if (button.parentElement !== host) {
+    host.appendChild(button);
+  }
+}
 
-  if (!mode) {
-    button.style.display = "none";
-    delete document.body.dataset.dashboardScreen;
-    document.documentElement.classList.remove("dashboard-presentation-mode");
-    document.body.classList.remove("dashboard-presentation-mode");
-    button.classList.remove("is-active");
-    button.textContent = "⛶";
+function closestHeaderHost(element: HTMLElement | undefined | null) {
+  return element?.closest<HTMLElement>(
+    [
+      ".master-dashboard-header",
+      ".master-header",
+      ".master-topbar",
+      ".esg-dashboard-header",
+      ".esg-header",
+      ".dashboard-header",
+      ".dashboard-hero",
+      ".page-hero",
+      "header",
+      "section",
+      ".panel",
+      "div",
+    ].join(", "),
+  );
+}
+
+function findMountHost() {
+  const button = ensureButton();
+
+  document
+    .querySelectorAll(".dashboard-fullscreen-inline-host, .dashboard-fullscreen-corner-host")
+    .forEach((item) => {
+      if (!item.contains(button)) {
+        item.classList.remove("dashboard-fullscreen-inline-host", "dashboard-fullscreen-corner-host");
+      }
+    });
+
+  if (isExecutiveDashboard()) {
+    const userBox = document.querySelector<HTMLElement>(".topbar .userbox, .userbox, .topbar-actions, .user-actions");
+    if (userBox) {
+      useInlineHost(button, userBox);
+      return;
+    }
+
+    const heading = findHeadingByText(["executive", "dashboard"]);
+    const host = closestHeaderHost(heading);
+    if (host) {
+      useCornerHost(button, host);
+      return;
+    }
+  }
+
+  if (isHseMasterDashboard()) {
+    const heading = findHeadingByText(["hse", "master", "dashboard"]);
+    const host = closestHeaderHost(heading);
+    if (host) {
+      useCornerHost(button, host);
+      return;
+    }
+  }
+
+  if (isEsgDashboard()) {
+    const heading = findHeadingByText(["esg", "master", "dashboard"]);
+    const host = closestHeaderHost(heading);
+    if (host) {
+      useCornerHost(button, host);
+      return;
+    }
+  }
+
+  document.body.appendChild(button);
+}
+
+function syncButton() {
+  const button = ensureButton();
+
+  if (!isDashboardPage()) {
+    button.hidden = true;
     return;
   }
 
-  document.body.dataset.dashboardScreen = mode;
-  button.style.display = "grid";
+  button.hidden = false;
+  button.textContent = presentationActive() ? "�" : "?";
+  button.setAttribute("aria-pressed", presentationActive() ? "true" : "false");
+
+  findMountHost();
 }
 
 function installDashboardFullscreenButton() {
   if (window.__hseDashboardFullscreenInstalled) return;
   window.__hseDashboardFullscreenInstalled = true;
 
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "dashboard-fullscreen-trigger";
-  button.textContent = "⛶";
-  button.title = "Open presentation view";
-  button.setAttribute("aria-label", "Open presentation view");
+  applyPresentationMode(presentationActive());
+  syncButton();
 
-  button.addEventListener("click", () => {
-    const active = !document.body.classList.contains("dashboard-presentation-mode");
-    setPresentationMode(active, button);
-  });
-
-  document.body.appendChild(button);
-  syncDashboardFullscreenButton(button);
-
-  const originalPushState = history.pushState;
-  const originalReplaceState = history.replaceState;
-
-  history.pushState = function (...args) {
-    originalPushState.apply(this, args);
-    setTimeout(() => syncDashboardFullscreenButton(button), 0);
-  };
-
-  history.replaceState = function (...args) {
-    originalReplaceState.apply(this, args);
-    setTimeout(() => syncDashboardFullscreenButton(button), 0);
-  };
-
-  window.addEventListener("popstate", () => syncDashboardFullscreenButton(button));
-  window.addEventListener("click", () => setTimeout(() => syncDashboardFullscreenButton(button), 50));
-
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && document.body.classList.contains("dashboard-presentation-mode")) {
-      setPresentationMode(false, button);
-    }
-  });
+  window.addEventListener("popstate", () => setTimeout(syncButton, 80));
+  window.addEventListener("hashchange", () => setTimeout(syncButton, 80));
+  window.addEventListener("click", () => setTimeout(syncButton, 120));
+  window.addEventListener("resize", () => setTimeout(syncButton, 120));
 
   document.addEventListener("fullscreenchange", () => {
-    if (!document.fullscreenElement && document.body.classList.contains("dashboard-presentation-mode")) {
-      setPresentationMode(false, button, false);
+    if (!document.fullscreenElement && presentationActive()) {
+      applyPresentationMode(false);
     }
+
+    syncButton();
   });
 
-  setInterval(() => syncDashboardFullscreenButton(button), 800);
+  setInterval(syncButton, 1200);
 }
 
 if (document.readyState === "loading") {
